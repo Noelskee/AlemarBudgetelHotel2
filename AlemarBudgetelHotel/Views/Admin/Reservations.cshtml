@@ -1,0 +1,117 @@
+@model IEnumerable<AlemarBudgetelHotel.Models.Reservation>
+
+@{
+    ViewData["Title"] = "Reservations Management";
+    Layout = "_AdminLayout";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-calendar-alt"></i> Reservations</h2>
+        <button class="btn btn-primary" onclick="window.location.href='/Admin/Index'">
+            <i class="fas fa-plus"></i> New Reservation
+        </button>
+    </div>
+
+    <!-- Filter Tabs -->
+    <ul class="nav nav-tabs mb-4">
+        <li class="nav-item">
+            <a class="nav-link active" href="#all">All Reservations</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#pending">Pending</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#confirmed">Confirmed</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#checkedin">Checked In</a>
+        </li>
+    </ul>
+
+    <!-- Reservations Table -->
+    <div class="card">
+        <div class="card-body">
+            @if (Model != null && Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Customer</th>
+                                <th>Room</th>
+                                <th>Check-In</th>
+                                <th>Check-Out</th>
+                                <th>Duration</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var reservation in Model)
+                            {
+                                <tr>
+                                    <td><strong>#@reservation.ReservationId</strong></td>
+                                    <td>
+                                        <i class="fas fa-user"></i> @reservation.Customer?.FullName
+                                    </td>
+                                    <td>
+                                        <i class="fas fa-bed"></i> Room @reservation.Room?.RoomNumber
+                                    </td>
+                                    <td>@reservation.CheckInDateTime.ToString("MMM dd, hh:mm tt")</td>
+                                    <td>@reservation.CheckOutDateTime.ToString("MMM dd, hh:mm tt")</td>
+                                    <td>
+                                        @if (reservation.Duration == DurationOption.ThreeHours) { <span>3 Hours</span> }
+                                        else if (reservation.Duration == DurationOption.TwelveHours) { <span>12 Hours</span> }
+                                        else { <span>24 Hours</span> }
+                                    </td>
+                                    <td><strong>₱@reservation.TotalAmount.ToString("N2")</strong></td>
+                                    <td>
+                                        @if (reservation.Status == ReservationStatus.Confirmed)
+                                        {
+                                            <span class="badge bg-success">Confirmed</span>
+                                        }
+                                        else if (reservation.Status == ReservationStatus.Pending)
+                                        {
+                                            <span class="badge bg-warning">Pending</span>
+                                        }
+                                        else if (reservation.Status == ReservationStatus.CheckedIn)
+                                        {
+                                            <span class="badge bg-info">Checked In</span>
+                                        }
+                                        else if (reservation.Status == ReservationStatus.CheckedOut)
+                                        {
+                                            <span class="badge bg-secondary">Checked Out</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger">Cancelled</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary" title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-success" title="Check In">
+                                            <i class="fas fa-sign-in-alt"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <i class="fas fa-calendar-times fa-4x text-muted mb-3"></i>
+                    <h4>No Reservations Yet</h4>
+                    <p class="text-muted">Reservations will appear here when customers book rooms</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>

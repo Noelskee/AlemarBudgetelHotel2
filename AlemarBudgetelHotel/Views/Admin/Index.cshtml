@@ -1,0 +1,188 @@
+@{
+    ViewData["Title"] = "Admin Dashboard";
+    Layout = "_AdminLayout";
+    var adminName = Context.Session.GetString("AdminName");
+}
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-tachometer-alt"></i> Dashboard</h2>
+        <button class="btn btn-outline-primary" onclick="location.reload()">
+            <i class="fas fa-sync-alt"></i> Refresh
+        </button>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card stat-card border-start border-primary border-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Today's Reservations</h6>
+                            <h3 class="mb-0">@ViewBag.TodayReservations</h3>
+                            <small class="text-success"><i class="fas fa-arrow-up"></i> New bookings</small>
+                        </div>
+                        <div class="stat-icon bg-primary">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card stat-card border-start border-success border-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Today's Revenue</h6>
+                            <h3 class="mb-0">₱@ViewBag.TodayRevenue.ToString("N2")</h3>
+                            <small class="text-success"><i class="fas fa-arrow-up"></i> From payments</small>
+                        </div>
+                        <div class="stat-icon bg-success">
+                            <i class="fas fa-peso-sign"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card stat-card border-start border-warning border-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Occupancy Rate</h6>
+                            <h3 class="mb-0">@ViewBag.OccupancyRate%</h3>
+                            <small class="text-warning"><i class="fas fa-bed"></i> Rooms occupied</small>
+                        </div>
+                        <div class="stat-icon bg-warning">
+                            <i class="fas fa-percentage"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card stat-card border-start border-info border-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">Total Customers</h6>
+                            <h3 class="mb-0">@ViewBag.TotalCustomers</h3>
+                            <small class="text-info"><i class="fas fa-users"></i> Registered</small>
+                        </div>
+                        <div class="stat-icon bg-info">
+                            <i class="fas fa-user-friends"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="card mb-4">
+        <div class="card-header bg-white">
+            <h5 class="mb-0"><i class="fas fa-bolt"></i> Quick Actions</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3 mb-2">
+                    <a href="/Admin/Reservations" class="btn btn-primary btn-lg w-100">
+                        <i class="fas fa-calendar-plus"></i> New Reservation
+                    </a>
+                </div>
+                <div class="col-md-3 mb-2">
+                    <a href="/Admin/Reservations" class="btn btn-warning btn-lg w-100">
+                        <i class="fas fa-clock"></i> Pending Check-ins
+                    </a>
+                </div>
+                <div class="col-md-3 mb-2">
+                    <a href="/Admin/Housekeeping" class="btn btn-success btn-lg w-100">
+                        <i class="fas fa-tasks"></i> Assign Task
+                    </a>
+                </div>
+                <div class="col-md-3 mb-2">
+                    <a href="/Admin/Reports" class="btn btn-info btn-lg w-100">
+                        <i class="fas fa-chart-bar"></i> View Reports
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Recent Reservations -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="fas fa-history"></i> Recent Reservations</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Customer</th>
+                                    <th>Room</th>
+                                    <th>Check-in</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted py-4">
+                                        <i class="fas fa-info-circle"></i> Reservations will appear here
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Tasks -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="fas fa-list-check"></i> Pending Tasks</h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center text-muted py-4">
+                        <i class="fas fa-circle-check text-success fa-3x mb-3"></i>
+                        <p class="mb-0">No pending tasks</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .stat-card {
+        transition: transform 0.2s;
+    }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 24px;
+    }
+</style>

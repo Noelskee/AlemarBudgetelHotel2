@@ -1,0 +1,107 @@
+@model IEnumerable<AlemarBudgetelHotel.Models.Reservation>
+
+@{
+    ViewData["Title"] = "My Reservations";
+}
+
+<div class="container mt-4">
+    <h1 class="mb-4"><i class="fas fa-list"></i> My Reservations</h1>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            <i class="fas fa-check-circle"></i> @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show">
+            <i class="fas fa-exclamation-circle"></i> @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i> You don't have any reservations yet.
+            <a href="/Customer/Rooms" class="alert-link">Browse available rooms</a>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var reservation in Model)
+            {
+                var durationText = reservation.Duration == DurationOption.ThreeHours ? "3 Hours" :
+                reservation.Duration == DurationOption.TwelveHours ? "12 Hours" : "24 Hours";
+
+                <div class="col-md-12 mb-4">
+                    <div class="card shadow">
+                        <div class="card-header bg-primary text-white">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-bed"></i> Room @reservation.Room.RoomNumber - @reservation.Room.Type
+                                    </h5>
+                                </div>
+                                <div class="col-md-4 text-end">
+                                    <span class="badge bg-@(reservation.Status == ReservationStatus.Confirmed ? "success" : reservation.Status == ReservationStatus.CheckedIn ? "info" : reservation.Status == ReservationStatus.CheckedOut ? "secondary" : "warning")">
+                                        @reservation.Status
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong><i class="fas fa-calendar-check"></i> Check-In:</strong> @reservation.CheckInDateTime.ToString("MMMM dd, yyyy hh:mm tt")</p>
+                                    <p><strong><i class="fas fa-calendar-times"></i> Check-Out:</strong> @reservation.CheckOutDateTime.ToString("MMMM dd, yyyy hh:mm tt")</p>
+                                    <p><strong><i class="fas fa-clock"></i> Duration:</strong> @durationText</p>
+                                    <p><strong><i class="fas fa-users"></i> Guests:</strong> @reservation.NumberOfGuests</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong><i class="fas fa-money-bill"></i> Total Amount:</strong> ₱@reservation.TotalAmount.ToString("N2")</p>
+                                    <p><strong><i class="fas fa-credit-card"></i> Payment Method:</strong> @reservation.Payment?.PaymentMethod</p>
+                                    <p>
+                                        <strong><i class="fas fa-receipt"></i> Payment Status:</strong>
+                                        <span class="badge bg-@(reservation.Payment?.Status == PaymentStatus.Completed ? "success" : "warning")">
+                                            @reservation.Payment?.Status
+                                        </span>
+                                    </p>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <p class="text-muted mb-0">
+                                        <small><i class="fas fa-info-circle"></i> Booked on: @reservation.CreatedAt.ToString("MMMM dd, yyyy hh:mm tt")</small>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        @if (reservation.Payment?.Status == PaymentStatus.Pending)
+                        {
+                            <div class="card-footer">
+                                <div class="alert alert-warning mb-0">
+                                    <i class="fas fa-exclamation-triangle"></i> Please proceed to reception to complete your payment.
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    <div class="text-center mt-4">
+        <a href="/Customer/Rooms" class="btn btn-primary btn-lg">
+            <i class="fas fa-plus-circle"></i> Book Another Room
+        </a>
+        <a href="/Customer/Index" class="btn btn-secondary btn-lg">
+            <i class="fas fa-home"></i> Back to Dashboard
+        </a>
+    </div>
+</div>

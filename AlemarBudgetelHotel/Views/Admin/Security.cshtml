@@ -1,0 +1,245 @@
+@model IEnumerable<AlemarBudgetelHotel.Models.AuditLog>
+
+@{
+    ViewData["Title"] = "Security Logs";
+    Layout = "_AdminLayout";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-shield-alt"></i> Security Logs</h2>
+        <div>
+            <button class="btn btn-outline-secondary me-2" onclick="window.print()">
+                <i class="fas fa-print"></i> Print
+            </button>
+            <button class="btn btn-outline-primary">
+                <i class="fas fa-download"></i> Export
+            </button>
+        </div>
+    </div>
+
+    <!-- Security Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card border-primary">
+                <div class="card-body text-center">
+                    <h3 class="text-primary">@(Model?.Count() ?? 0)</h3>
+                    <p class="mb-0">Total Logs</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-success">
+                <div class="card-body text-center">
+                    <h3 class="text-success">@(Model?.Count(l => l.Action == "Login") ?? 0)</h3>
+                    <p class="mb-0">Login Attempts</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-warning">
+                <div class="card-body text-center">
+                    <h3 class="text-warning">@(Model?.Count(l => l.Action == "Registration") ?? 0)</h3>
+                    <p class="mb-0">Registrations</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-info">
+                <div class="card-body text-center">
+                    <h3 class="text-info">@(Model?.Count(l => l.CreatedAt.Date == DateTime.Today) ?? 0)</h3>
+                    <p class="mb-0">Today's Activity</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3">
+                    <label class="form-label">Action Type</label>
+                    <select class="form-select" id="actionFilter">
+                        <option value="">All Actions</option>
+                        <option value="Login">Login</option>
+                        <option value="Logout">Logout</option>
+                        <option value="Registration">Registration</option>
+                        <option value="Booking">Booking</option>
+                        <option value="Payment">Payment</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">From Date</label>
+                    <input type="date" class="form-control" id="fromDate">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">To Date</label>
+                    <input type="date" class="form-control" id="toDate">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">&nbsp;</label>
+                    <button class="btn btn-primary w-100">
+                        <i class="fas fa-filter"></i> Apply Filter
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audit Logs Table -->
+    <div class="card">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">Audit Trail</h5>
+        </div>
+        <div class="card-body p-0">
+            @if (Model != null && Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0" id="auditTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Log ID</th>
+                                <th>Timestamp</th>
+                                <th>Action</th>
+                                <th>User</th>
+                                <th>Details</th>
+                                <th>IP Address</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var log in Model)
+                            {
+                                <tr>
+                                    <td><strong>#@log.LogId</strong></td>
+                                    <td>@log.CreatedAt.ToString("MMM dd, yyyy hh:mm:ss tt")</td>
+                                    <td>
+                                        @if (log.Action == "Login")
+                                        {
+                                            <span class="badge bg-success"><i class="fas fa-sign-in-alt"></i> Login</span>
+                                        }
+                                        else if (log.Action == "Logout")
+                                        {
+                                            <span class="badge bg-secondary"><i class="fas fa-sign-out-alt"></i> Logout</span>
+                                        }
+                                        else if (log.Action == "Registration")
+                                        {
+                                            <span class="badge bg-primary"><i class="fas fa-user-plus"></i> Registration</span>
+                                        }
+                                        else if (log.Action == "Booking")
+                                        {
+                                            <span class="badge bg-info"><i class="fas fa-calendar"></i> Booking</span>
+                                        }
+                                        else if (log.Action == "Payment")
+                                        {
+                                            <span class="badge bg-warning"><i class="fas fa-credit-card"></i> Payment</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-dark">@log.Action</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <i class="fas fa-user-circle"></i> 
+                                        @if (log.UserId.HasValue)
+                                        {
+                                            <span>User #@log.UserId</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Guest</span>
+                                        }
+                                    </td>
+                                    <td>@log.Details</td>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(log.IpAddress))
+                                        {
+                                            <code>@log.IpAddress</code>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">N/A</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (log.Details?.Contains("success") == true || log.Action == "Login")
+                                        {
+                                            <span class="badge bg-success">Success</span>
+                                        }
+                                        else if (log.Details?.Contains("failed") == true)
+                                        {
+                                            <span class="badge bg-danger">Failed</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-info">Info</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <i class="fas fa-shield-alt fa-4x text-muted mb-3"></i>
+                    <h4>No Security Logs</h4>
+                    <p class="text-muted">Security logs will appear here as users interact with the system</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Simple table search/filter
+        document.getElementById('actionFilter')?.addEventListener('change', function() {
+            const filterValue = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#auditTable tbody tr');
+            
+            rows.forEach(row => {
+                const actionCell = row.cells[2].textContent.toLowerCase();
+                if (filterValue === '' || actionCell.includes(filterValue)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+
+        // Date range filter
+        document.querySelector('.btn-primary[onclick]')?.addEventListener('click', function(e) {
+            if (e.target.classList.contains('fa-filter') || e.target.querySelector('.fa-filter')) {
+                const fromDate = document.getElementById('fromDate').value;
+                const toDate = document.getElementById('toDate').value;
+                
+                if (fromDate || toDate) {
+                    alert('Date filtering will be implemented with server-side filtering');
+                }
+            }
+        });
+    </script>
+}
+
+<style>
+    .table-hover tbody tr:hover {
+        background-color: rgba(0, 123, 255, 0.05);
+    }
+    
+    code {
+        background-color: #f8f9fa;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-size: 0.875rem;
+    }
+    
+    @@media print {
+        .btn, .card-header {
+            display: none !important;
+        }
+    }
+</style>

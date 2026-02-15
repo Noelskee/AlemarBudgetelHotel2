@@ -1,0 +1,225 @@
+@model AlemarBudgetelHotel.Models.Reservation
+
+@{
+    ViewData["Title"] = "Payment";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- Progress Indicator -->
+            <div class="mb-4">
+                <div class="d-flex justify-content-between">
+                    <div class="text-center">
+                        <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <p class="small mt-2 mb-0">Booking Details</p>
+                    </div>
+                    <div style="flex: 1; align-self: center; height: 2px; background: #28a745; margin: 0 10px;"></div>
+                    <div class="text-center">
+                        <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                            <strong>2</strong>
+                        </div>
+                        <p class="small mt-2 mb-0">Payment</p>
+                    </div>
+                    <div style="flex: 1; align-self: center; height: 2px; background: #dee2e6; margin: 0 10px;"></div>
+                    <div class="text-center">
+                        <div class="bg-secondary text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                            <strong>3</strong>
+                        </div>
+                        <p class="small mt-2 mb-0">Confirmation</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow">
+                <div class="card-header bg-success text-white text-center">
+                    <h3><i class="fas fa-mobile-alt"></i> GCash Payment</h3>
+                    <p class="mb-0">Complete your reservation payment</p>
+                </div>
+                <div class="card-body p-4">
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle"></i> @TempData["Success"]
+                        </div>
+                    }
+                    @if (TempData["Error"] != null)
+                    {
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-circle"></i> @TempData["Error"]
+                        </div>
+                    }
+
+                    <!-- Reservation Details -->
+                    <div class="alert alert-info mb-4">
+                        <h5><i class="fas fa-info-circle"></i> Reservation Details</h5>
+                        <div class="row">
+                            <div class="col-6">
+                                <p class="mb-1"><strong>Room:</strong> @Model.Room.RoomNumber</p>
+                                <p class="mb-1"><strong>Type:</strong> @Model.Room.Type</p>
+                                <p class="mb-1">
+                                    <strong>Duration:</strong>
+                                    @if (Model.Duration == DurationOption.ThreeHours)
+                                    {
+                                        <span>3 Hours</span>
+                                    }
+                                    else if (Model.Duration == DurationOption.TwelveHours)
+                                    {
+
+                                        <span>12 Hours</span>
+                                    }
+                                    else
+                                    {
+
+                                        <span>24 Hours</span>
+                                    }
+                                </p>
+                            </div>
+                            <div class="col-6">
+                                <p class="mb-1"><strong>Check-in:</strong> @Model.CheckInDateTime.ToString("MMM dd, yyyy hh:mm tt")</p>
+                                <p class="mb-1"><strong>Check-out:</strong> @Model.CheckOutDateTime.ToString("MMM dd, yyyy hh:mm tt")</p>
+                                <p class="mb-1"><strong>Guests:</strong> @Model.NumberOfGuests</p>
+                            </div>
+                        </div>
+                        @if (!string.IsNullOrEmpty(Model.SpecialRequests))
+                        {
+                            <hr>
+                            <p class="mb-0"><strong>Special Requests:</strong> @Model.SpecialRequests</p>
+                        }
+                        <hr>
+                        <h4 class="text-center mb-0">
+                            <strong>Total Amount:</strong>
+                            <span class="text-success">₱@Model.TotalAmount.ToString("N2")</span>
+                        </h4>
+                    </div>
+
+                    <!-- GCash Payment Section -->
+                    <div class="card bg-light mb-4">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 text-center">
+                                    <h5 class="mb-3">Scan GCash QR Code</h5>
+                                    <div class="qr-code-placeholder mx-auto mb-3" style="width: 250px; height: 250px; background: white; border: 2px solid #28a745; display: flex; align-items: center; justify-content: center; border-radius: 10px;">
+                                        <div class="text-center p-3">
+                                            <i class="fas fa-qrcode fa-5x text-success mb-2"></i>
+                                            <p class="text-muted mb-0">GCash QR Code</p>
+                                            <p class="fw-bold text-success mt-2">₱@Model.TotalAmount.ToString("N2")</p>
+                                            <small class="text-muted">Scan to pay</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <h5 class="mb-3">Payment Instructions</h5>
+                                    <div class="alert alert-success mb-3">
+                                        <p class="mb-1"><strong>GCash Number:</strong></p>
+                                        <h5 class="mb-2">0917-123-4567</h5>
+                                        <p class="mb-0"><strong>Account Name:</strong><br>Alemar Budgetel Hotel</p>
+                                    </div>
+                                    <ol class="ps-3">
+                                        <li class="mb-2">Open your GCash app</li>
+                                        <li class="mb-2">Scan the QR code or send to the number above</li>
+                                        <li class="mb-2">Enter amount: <strong class="text-success">₱@Model.TotalAmount.ToString("N2")</strong></li>
+                                        <li class="mb-2">Complete the payment</li>
+                                        <li>Enter the reference number below</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Confirmation Form -->
+                    <form method="post" asp-controller="Customer" asp-action="ConfirmPayment" id="paymentForm">
+                        <input type="hidden" name="reservationId" value="@Model.ReservationId" />
+
+                        <h5 class="mb-3"><i class="fas fa-receipt"></i> Payment Confirmation</h5>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-hashtag"></i> GCash Reference Number *
+                                </label>
+                                <input type="text"
+                                       name="gcashReferenceNumber"
+                                       id="gcashRefInput"
+                                       class="form-control form-control-lg"
+                                       placeholder="Enter 13-digit reference number"
+                                       required
+                                       pattern="[0-9]{13}"
+                                       maxlength="13" />
+                                <small class="text-muted">Found in your GCash transaction receipt</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-phone"></i> Your GCash Mobile Number *
+                                </label>
+                                <input type="tel"
+                                       name="gcashPhoneNumber"
+                                       id="gcashPhoneInput"
+                                       class="form-control form-control-lg"
+                                       placeholder="09XXXXXXXXX"
+                                       required
+                                       pattern="09[0-9]{9}"
+                                       maxlength="11" />
+                                <small class="text-muted">The number you used for payment</small>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <strong>Important:</strong> Please make sure you have completed the GCash payment before submitting.
+                            Your reservation will be confirmed once payment is verified.
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-check-circle"></i> Confirm Payment & Complete Booking
+                            </button>
+                            <a href="/Customer/Rooms" class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i> Cancel Reservation
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Format GCash reference number input
+        document.getElementById('gcashRefInput').addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '').slice(0, 13);
+        });
+
+        // Format phone number input
+        document.getElementById('gcashPhoneInput').addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '').slice(0, 11);
+        });
+
+        // Form validation
+        document.getElementById('paymentForm').addEventListener('submit', function(e) {
+            const gcashRef = document.getElementById('gcashRefInput').value;
+            const gcashPhone = document.getElementById('gcashPhoneInput').value;
+
+            if (gcashRef.length !== 13) {
+                e.preventDefault();
+                alert('GCash reference number must be exactly 13 digits');
+                return false;
+            }
+
+            if (gcashPhone.length !== 11 || !gcashPhone.startsWith('09')) {
+                e.preventDefault();
+                alert('Please enter a valid GCash mobile number (09XXXXXXXXX)');
+                return false;
+            }
+
+            if (!confirm('Have you completed the GCash payment of ₱@Model.TotalAmount.ToString("N2")?')) {
+                e.preventDefault();
+                return false;
+            }
+        });
+    </script>
+}
