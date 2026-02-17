@@ -63,13 +63,10 @@ namespace AlemarBudgetelHotel.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     FullName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Email = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Username = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PhoneNumber = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     Address = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    LastLoginAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    IsActive = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -98,6 +95,27 @@ namespace AlemarBudgetelHotel.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Rooms", x => x.RoomId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Staffs",
+                columns: table => new
+                {
+                    StaffId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FullName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Username = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    Role = table.Column<int>(type: "int", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LastLoginAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Staffs", x => x.StaffId);
                 });
 
             migrationBuilder.CreateTable(
@@ -209,29 +227,39 @@ namespace AlemarBudgetelHotel.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "Admins",
+                columns: new[] { "AdminId", "CreatedAt", "Email", "FullName", "IsActive", "LastLoginAt", "PasswordHash", "PhoneNumber", "Role", "Username" },
+                values: new object[] { 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin@alemarbudgetel.com", "System Administrator", true, null, "qDfXe1HpFSTpUK9iIS+55zQKQBdO13h5A2zcar0BTwGV9TPiHwwfoa/aITNI4pny", "09123456789", "SuperAdmin", "admin" });
+
+            migrationBuilder.InsertData(
                 table: "Rooms",
                 columns: new[] { "RoomId", "Capacity", "CreatedAt", "Description", "Floor", "ImageUrl", "Price12Hours", "Price24Hours", "Price3Hours", "RoomNumber", "Status", "Type", "UpdatedAt" },
                 values: new object[,]
                 {
-                    { 1, 1, new DateTime(2026, 2, 15, 0, 18, 53, 782, DateTimeKind.Local).AddTicks(2362), "Cozy single room", 1, "/images/rooms/single.jpg", 800m, 1200m, 300m, "101", 0, 0, null },
-                    { 2, 1, new DateTime(2026, 2, 15, 0, 18, 53, 782, DateTimeKind.Local).AddTicks(2372), "Cozy single room", 1, "/images/rooms/single.jpg", 800m, 1200m, 300m, "102", 0, 0, null },
-                    { 3, 1, new DateTime(2026, 2, 15, 0, 18, 53, 782, DateTimeKind.Local).AddTicks(2383), "Cozy single room", 1, "/images/rooms/single.jpg", 800m, 1200m, 300m, "103", 0, 0, null },
-                    { 4, 2, new DateTime(2026, 2, 15, 0, 18, 53, 782, DateTimeKind.Local).AddTicks(2393), "Comfortable double room", 2, "/images/rooms/double.jpg", 1200m, 1800m, 500m, "201", 0, 1, null },
-                    { 5, 2, new DateTime(2026, 2, 15, 0, 18, 53, 782, DateTimeKind.Local).AddTicks(2403), "Comfortable double room", 2, "/images/rooms/double.jpg", 1200m, 1800m, 500m, "202", 0, 1, null },
-                    { 6, 2, new DateTime(2026, 2, 15, 0, 18, 53, 782, DateTimeKind.Local).AddTicks(2411), "Comfortable double room", 2, "/images/rooms/double.jpg", 1200m, 1800m, 500m, "203", 0, 1, null },
-                    { 7, 2, new DateTime(2026, 2, 15, 0, 18, 53, 782, DateTimeKind.Local).AddTicks(2420), "Standard room with modern amenities", 3, "/images/rooms/standard.jpg", 1800m, 2500m, 700m, "301", 0, 2, null },
-                    { 8, 2, new DateTime(2026, 2, 15, 0, 18, 53, 782, DateTimeKind.Local).AddTicks(2428), "Standard room with modern amenities", 3, "/images/rooms/standard.jpg", 1800m, 2500m, 700m, "302", 0, 2, null },
-                    { 9, 2, new DateTime(2026, 2, 15, 0, 18, 53, 782, DateTimeKind.Local).AddTicks(2436), "Standard room with modern amenities", 3, "/images/rooms/standard.jpg", 1800m, 2500m, 700m, "303", 0, 2, null },
-                    { 10, 3, new DateTime(2026, 2, 15, 0, 18, 53, 782, DateTimeKind.Local).AddTicks(2443), "Deluxe room with premium facilities", 4, "/images/rooms/deluxe.jpg", 2500m, 3500m, 1000m, "401", 0, 3, null },
-                    { 11, 3, new DateTime(2026, 2, 15, 0, 18, 53, 782, DateTimeKind.Local).AddTicks(2451), "Deluxe room with premium facilities", 4, "/images/rooms/deluxe.jpg", 2500m, 3500m, 1000m, "402", 0, 3, null },
-                    { 12, 3, new DateTime(2026, 2, 15, 0, 18, 53, 782, DateTimeKind.Local).AddTicks(2459), "Deluxe room with premium facilities", 4, "/images/rooms/deluxe.jpg", 2500m, 3500m, 1000m, "403", 0, 3, null },
-                    { 13, 4, new DateTime(2026, 2, 15, 0, 18, 53, 782, DateTimeKind.Local).AddTicks(2467), "Super deluxe room with luxury amenities", 5, "/images/rooms/super-deluxe.jpg", 3500m, 5000m, 1500m, "501", 0, 4, null },
-                    { 14, 4, new DateTime(2026, 2, 15, 0, 18, 53, 782, DateTimeKind.Local).AddTicks(2476), "Super deluxe room with luxury amenities", 5, "/images/rooms/super-deluxe.jpg", 3500m, 5000m, 1500m, "502", 0, 4, null },
-                    { 15, 4, new DateTime(2026, 2, 15, 0, 18, 53, 782, DateTimeKind.Local).AddTicks(2484), "Super deluxe room with luxury amenities", 5, "/images/rooms/super-deluxe.jpg", 3500m, 5000m, 1500m, "503", 0, 4, null },
-                    { 16, 5, new DateTime(2026, 2, 15, 0, 18, 53, 782, DateTimeKind.Local).AddTicks(2492), "Premium super duper suite", 6, "/images/rooms/super-duper.jpg", 5000m, 7000m, 2000m, "601", 0, 5, null },
-                    { 17, 5, new DateTime(2026, 2, 15, 0, 18, 53, 782, DateTimeKind.Local).AddTicks(2500), "Premium super duper suite", 6, "/images/rooms/super-duper.jpg", 5000m, 7000m, 2000m, "602", 0, 5, null },
-                    { 18, 5, new DateTime(2026, 2, 15, 0, 18, 53, 782, DateTimeKind.Local).AddTicks(2507), "Premium super duper suite", 6, "/images/rooms/super-duper.jpg", 5000m, 7000m, 2000m, "603", 0, 5, null }
+                    { 1, 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Cozy single room", 1, "/images/rooms/single.jpg", 800m, 1200m, 300m, "101", 0, 0, null },
+                    { 2, 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Cozy single room", 1, "/images/rooms/single.jpg", 800m, 1200m, 300m, "102", 0, 0, null },
+                    { 3, 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Cozy single room", 1, "/images/rooms/single.jpg", 800m, 1200m, 300m, "103", 0, 0, null },
+                    { 4, 2, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Comfortable double room", 2, "/images/rooms/double.jpg", 1200m, 1800m, 500m, "201", 0, 1, null },
+                    { 5, 2, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Comfortable double room", 2, "/images/rooms/double.jpg", 1200m, 1800m, 500m, "202", 0, 1, null },
+                    { 6, 2, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Comfortable double room", 2, "/images/rooms/double.jpg", 1200m, 1800m, 500m, "203", 0, 1, null },
+                    { 7, 2, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Standard room with modern amenities", 3, "/images/rooms/standard.jpg", 1800m, 2500m, 700m, "301", 0, 2, null },
+                    { 8, 2, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Standard room with modern amenities", 3, "/images/rooms/standard.jpg", 1800m, 2500m, 700m, "302", 0, 2, null },
+                    { 9, 2, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Standard room with modern amenities", 3, "/images/rooms/standard.jpg", 1800m, 2500m, 700m, "303", 0, 2, null },
+                    { 10, 3, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Deluxe room with premium facilities", 4, "/images/rooms/deluxe.jpg", 2500m, 3500m, 1000m, "401", 0, 3, null },
+                    { 11, 3, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Deluxe room with premium facilities", 4, "/images/rooms/deluxe.jpg", 2500m, 3500m, 1000m, "402", 0, 3, null },
+                    { 12, 3, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Deluxe room with premium facilities", 4, "/images/rooms/deluxe.jpg", 2500m, 3500m, 1000m, "403", 0, 3, null },
+                    { 13, 4, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Super deluxe room with luxury amenities", 5, "/images/rooms/super-deluxe.jpg", 3500m, 5000m, 1500m, "501", 0, 4, null },
+                    { 14, 4, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Super deluxe room with luxury amenities", 5, "/images/rooms/super-deluxe.jpg", 3500m, 5000m, 1500m, "502", 0, 4, null },
+                    { 15, 4, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Super deluxe room with luxury amenities", 5, "/images/rooms/super-deluxe.jpg", 3500m, 5000m, 1500m, "503", 0, 4, null },
+                    { 16, 5, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Premium super duper suite", 6, "/images/rooms/super-duper.jpg", 5000m, 7000m, 2000m, "601", 0, 5, null },
+                    { 17, 5, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Premium super duper suite", 6, "/images/rooms/super-duper.jpg", 5000m, 7000m, 2000m, "602", 0, 5, null },
+                    { 18, 5, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Premium super duper suite", 6, "/images/rooms/super-duper.jpg", 5000m, 7000m, 2000m, "603", 0, 5, null }
                 });
+
+            migrationBuilder.InsertData(
+                table: "Staffs",
+                columns: new[] { "StaffId", "CreatedAt", "Email", "FullName", "IsActive", "LastLoginAt", "PasswordHash", "PhoneNumber", "Role", "Username" },
+                values: new object[] { 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "staff@alemarbudgetel.com", "Front Desk Staff", true, null, "LzAq/v8+4XjvJU4ZigHw/ZomW3RUlF4xHjLk8XTKuns=", "09123456780", 2, "staff" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Admins_Email",
@@ -242,18 +270,6 @@ namespace AlemarBudgetelHotel.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Admins_Username",
                 table: "Admins",
-                column: "Username",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Customers_Email",
-                table: "Customers",
-                column: "Email",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Customers_Username",
-                table: "Customers",
                 column: "Username",
                 unique: true);
 
@@ -293,6 +309,18 @@ namespace AlemarBudgetelHotel.Migrations
                 table: "Rooms",
                 column: "RoomNumber",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Staffs_Email",
+                table: "Staffs",
+                column: "Email",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Staffs_Username",
+                table: "Staffs",
+                column: "Username",
+                unique: true);
         }
 
         /// <inheritdoc />
@@ -306,6 +334,9 @@ namespace AlemarBudgetelHotel.Migrations
 
             migrationBuilder.DropTable(
                 name: "Payments");
+
+            migrationBuilder.DropTable(
+                name: "Staffs");
 
             migrationBuilder.DropTable(
                 name: "Admins");

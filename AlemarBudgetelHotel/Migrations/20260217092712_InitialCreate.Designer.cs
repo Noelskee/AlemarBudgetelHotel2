@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AlemarBudgetelHotel.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260214161856_InitialCreate")]
+    [Migration("20260217092712_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -80,6 +80,20 @@ namespace AlemarBudgetelHotel.Migrations
                         .IsUnique();
 
                     b.ToTable("Admins");
+
+                    b.HasData(
+                        new
+                        {
+                            AdminId = 1,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "admin@alemarbudgetel.com",
+                            FullName = "System Administrator",
+                            IsActive = true,
+                            PasswordHash = "qDfXe1HpFSTpUK9iIS+55zQKQBdO13h5A2zcar0BTwGV9TPiHwwfoa/aITNI4pny",
+                            PhoneNumber = "09123456789",
+                            Role = "SuperAdmin",
+                            Username = "admin"
+                        });
                 });
 
             modelBuilder.Entity("AlemarBudgetelHotel.Models.AuditLog", b =>
@@ -163,30 +177,12 @@ namespace AlemarBudgetelHotel.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime?>("LastLoginAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("PasswordHash")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
                     b.HasKey("CustomerId");
-
-                    b.HasIndex("Email")
-                        .IsUnique();
-
-                    b.HasIndex("Username")
-                        .IsUnique();
 
                     b.ToTable("Customers");
                 });
@@ -428,7 +424,7 @@ namespace AlemarBudgetelHotel.Migrations
                         {
                             RoomId = 1,
                             Capacity = 1,
-                            CreatedAt = new DateTime(2026, 2, 15, 0, 18, 53, 782, DateTimeKind.Local).AddTicks(2362),
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Cozy single room",
                             Floor = 1,
                             ImageUrl = "/images/rooms/single.jpg",
@@ -443,7 +439,7 @@ namespace AlemarBudgetelHotel.Migrations
                         {
                             RoomId = 2,
                             Capacity = 1,
-                            CreatedAt = new DateTime(2026, 2, 15, 0, 18, 53, 782, DateTimeKind.Local).AddTicks(2372),
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Cozy single room",
                             Floor = 1,
                             ImageUrl = "/images/rooms/single.jpg",
@@ -458,7 +454,7 @@ namespace AlemarBudgetelHotel.Migrations
                         {
                             RoomId = 3,
                             Capacity = 1,
-                            CreatedAt = new DateTime(2026, 2, 15, 0, 18, 53, 782, DateTimeKind.Local).AddTicks(2383),
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Cozy single room",
                             Floor = 1,
                             ImageUrl = "/images/rooms/single.jpg",
@@ -473,7 +469,7 @@ namespace AlemarBudgetelHotel.Migrations
                         {
                             RoomId = 4,
                             Capacity = 2,
-                            CreatedAt = new DateTime(2026, 2, 15, 0, 18, 53, 782, DateTimeKind.Local).AddTicks(2393),
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Comfortable double room",
                             Floor = 2,
                             ImageUrl = "/images/rooms/double.jpg",
@@ -488,7 +484,7 @@ namespace AlemarBudgetelHotel.Migrations
                         {
                             RoomId = 5,
                             Capacity = 2,
-                            CreatedAt = new DateTime(2026, 2, 15, 0, 18, 53, 782, DateTimeKind.Local).AddTicks(2403),
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Comfortable double room",
                             Floor = 2,
                             ImageUrl = "/images/rooms/double.jpg",
@@ -503,7 +499,7 @@ namespace AlemarBudgetelHotel.Migrations
                         {
                             RoomId = 6,
                             Capacity = 2,
-                            CreatedAt = new DateTime(2026, 2, 15, 0, 18, 53, 782, DateTimeKind.Local).AddTicks(2411),
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Comfortable double room",
                             Floor = 2,
                             ImageUrl = "/images/rooms/double.jpg",
@@ -518,7 +514,7 @@ namespace AlemarBudgetelHotel.Migrations
                         {
                             RoomId = 7,
                             Capacity = 2,
-                            CreatedAt = new DateTime(2026, 2, 15, 0, 18, 53, 782, DateTimeKind.Local).AddTicks(2420),
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Standard room with modern amenities",
                             Floor = 3,
                             ImageUrl = "/images/rooms/standard.jpg",
@@ -533,7 +529,7 @@ namespace AlemarBudgetelHotel.Migrations
                         {
                             RoomId = 8,
                             Capacity = 2,
-                            CreatedAt = new DateTime(2026, 2, 15, 0, 18, 53, 782, DateTimeKind.Local).AddTicks(2428),
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Standard room with modern amenities",
                             Floor = 3,
                             ImageUrl = "/images/rooms/standard.jpg",
@@ -548,7 +544,7 @@ namespace AlemarBudgetelHotel.Migrations
                         {
                             RoomId = 9,
                             Capacity = 2,
-                            CreatedAt = new DateTime(2026, 2, 15, 0, 18, 53, 782, DateTimeKind.Local).AddTicks(2436),
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Standard room with modern amenities",
                             Floor = 3,
                             ImageUrl = "/images/rooms/standard.jpg",
@@ -563,7 +559,7 @@ namespace AlemarBudgetelHotel.Migrations
                         {
                             RoomId = 10,
                             Capacity = 3,
-                            CreatedAt = new DateTime(2026, 2, 15, 0, 18, 53, 782, DateTimeKind.Local).AddTicks(2443),
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Deluxe room with premium facilities",
                             Floor = 4,
                             ImageUrl = "/images/rooms/deluxe.jpg",
@@ -578,7 +574,7 @@ namespace AlemarBudgetelHotel.Migrations
                         {
                             RoomId = 11,
                             Capacity = 3,
-                            CreatedAt = new DateTime(2026, 2, 15, 0, 18, 53, 782, DateTimeKind.Local).AddTicks(2451),
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Deluxe room with premium facilities",
                             Floor = 4,
                             ImageUrl = "/images/rooms/deluxe.jpg",
@@ -593,7 +589,7 @@ namespace AlemarBudgetelHotel.Migrations
                         {
                             RoomId = 12,
                             Capacity = 3,
-                            CreatedAt = new DateTime(2026, 2, 15, 0, 18, 53, 782, DateTimeKind.Local).AddTicks(2459),
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Deluxe room with premium facilities",
                             Floor = 4,
                             ImageUrl = "/images/rooms/deluxe.jpg",
@@ -608,7 +604,7 @@ namespace AlemarBudgetelHotel.Migrations
                         {
                             RoomId = 13,
                             Capacity = 4,
-                            CreatedAt = new DateTime(2026, 2, 15, 0, 18, 53, 782, DateTimeKind.Local).AddTicks(2467),
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Super deluxe room with luxury amenities",
                             Floor = 5,
                             ImageUrl = "/images/rooms/super-deluxe.jpg",
@@ -623,7 +619,7 @@ namespace AlemarBudgetelHotel.Migrations
                         {
                             RoomId = 14,
                             Capacity = 4,
-                            CreatedAt = new DateTime(2026, 2, 15, 0, 18, 53, 782, DateTimeKind.Local).AddTicks(2476),
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Super deluxe room with luxury amenities",
                             Floor = 5,
                             ImageUrl = "/images/rooms/super-deluxe.jpg",
@@ -638,7 +634,7 @@ namespace AlemarBudgetelHotel.Migrations
                         {
                             RoomId = 15,
                             Capacity = 4,
-                            CreatedAt = new DateTime(2026, 2, 15, 0, 18, 53, 782, DateTimeKind.Local).AddTicks(2484),
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Super deluxe room with luxury amenities",
                             Floor = 5,
                             ImageUrl = "/images/rooms/super-deluxe.jpg",
@@ -653,7 +649,7 @@ namespace AlemarBudgetelHotel.Migrations
                         {
                             RoomId = 16,
                             Capacity = 5,
-                            CreatedAt = new DateTime(2026, 2, 15, 0, 18, 53, 782, DateTimeKind.Local).AddTicks(2492),
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Premium super duper suite",
                             Floor = 6,
                             ImageUrl = "/images/rooms/super-duper.jpg",
@@ -668,7 +664,7 @@ namespace AlemarBudgetelHotel.Migrations
                         {
                             RoomId = 17,
                             Capacity = 5,
-                            CreatedAt = new DateTime(2026, 2, 15, 0, 18, 53, 782, DateTimeKind.Local).AddTicks(2500),
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Premium super duper suite",
                             Floor = 6,
                             ImageUrl = "/images/rooms/super-duper.jpg",
@@ -683,7 +679,7 @@ namespace AlemarBudgetelHotel.Migrations
                         {
                             RoomId = 18,
                             Capacity = 5,
-                            CreatedAt = new DateTime(2026, 2, 15, 0, 18, 53, 782, DateTimeKind.Local).AddTicks(2507),
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Premium super duper suite",
                             Floor = 6,
                             ImageUrl = "/images/rooms/super-duper.jpg",
@@ -693,6 +689,75 @@ namespace AlemarBudgetelHotel.Migrations
                             RoomNumber = "603",
                             Status = 0,
                             Type = 5
+                        });
+                });
+
+            modelBuilder.Entity("AlemarBudgetelHotel.Models.Staff", b =>
+                {
+                    b.Property<int>("StaffId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("StaffId"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastLoginAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<int>("Role")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("StaffId");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.HasIndex("Username")
+                        .IsUnique();
+
+                    b.ToTable("Staffs");
+
+                    b.HasData(
+                        new
+                        {
+                            StaffId = 1,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "staff@alemarbudgetel.com",
+                            FullName = "Front Desk Staff",
+                            IsActive = true,
+                            PasswordHash = "LzAq/v8+4XjvJU4ZigHw/ZomW3RUlF4xHjLk8XTKuns=",
+                            PhoneNumber = "09123456780",
+                            Role = 2,
+                            Username = "staff"
                         });
                 });
 

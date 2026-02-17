@@ -2,8 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using AlemarBudgetelHotel.Data;
 using AlemarBudgetelHotel.Models;
-using AlemarBudgetelHotel.Helpers;
-using System.Linq;
 
 namespace AlemarBudgetelHotel.Controllers
 {
@@ -17,104 +15,18 @@ namespace AlemarBudgetelHotel.Controllers
         }
 
         // ==========================================
-        // DASHBOARD
+        // ROOMS - Browse available rooms (no login needed)
         // ==========================================
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var customerId = HttpContext.Session.GetInt32("CustomerId");
-            if (customerId == null)
-                return RedirectToAction("Login");
-            return View();
+            var rooms = await _context.Rooms
+                .Where(r => r.Status == RoomStatus.Available)
+                .ToListAsync();
+            return View(rooms);
         }
 
-        // ==========================================
-        // LOGIN
-        // ==========================================
-        public IActionResult Login() => View();
-
-        [HttpPost]
-        public async Task<IActionResult> Login(string username, string password)
-        {
-            var customer = await _context.Customers
-                .FirstOrDefaultAsync(c => c.Username == username && c.IsActive);
-
-            if (customer != null && CustomerPasswordHasher.VerifyPassword(password, customer.PasswordHash))
-            {
-                HttpContext.Session.SetInt32("CustomerId", customer.CustomerId);
-                HttpContext.Session.SetString("CustomerName", customer.FullName);
-                return RedirectToAction("Index");
-            }
-
-            ViewBag.Error = "Invalid credentials";
-            return View();
-        }
-
-        // ==========================================
-        // REGISTER
-        // ==========================================
-        public IActionResult Register() => View();
-
-        [HttpPost]
-        public async Task<IActionResult> Register(Customer customer, string password, string confirmPassword)
-        {
-            try
-            {
-                if (password != confirmPassword)
-                {
-                    ViewBag.Error = "Passwords do not match!";
-                    return View(customer);
-                }
-
-                if (password.Length < 6)
-                {
-                    ViewBag.Error = "Password must be at least 6 characters long!";
-                    return View(customer);
-                }
-
-                // Check if username already exists
-                var existingUsername = await _context.Customers
-                    .AnyAsync(c => c.Username == customer.Username);
-                if (existingUsername)
-                {
-                    ViewBag.Error = "Username already exists!";
-                    return View(customer);
-                }
-
-                // Check if email already exists
-                var existingEmail = await _context.Customers
-                    .AnyAsync(c => c.Email == customer.Email);
-                if (existingEmail)
-                {
-                    ViewBag.Error = "Email already exists!";
-                    return View(customer);
-                }
-
-                customer.PasswordHash = CustomerPasswordHasher.HashPassword(password);
-                customer.IsActive = true;
-                customer.CreatedAt = DateTime.Now;
-
-                _context.Customers.Add(customer);
-                await _context.SaveChangesAsync();
-
-                TempData["Success"] = "Account created successfully! You can now login.";
-                return RedirectToAction("Login");
-            }
-            catch (Exception ex)
-            {
-                ViewBag.Error = "Registration failed. Please try again.";
-                return View(customer);
-            }
-        }
-
-        // ==========================================
-        // ROOMS - Browse available rooms
-        // ==========================================
         public async Task<IActionResult> Rooms()
         {
-            var customerId = HttpContext.Session.GetInt32("CustomerId");
-            if (customerId == null)
-                return RedirectToAction("Login");
-
             var rooms = await _context.Rooms
                 .Where(r => r.Status == RoomStatus.Available)
                 .ToListAsync();
@@ -122,39 +34,31 @@ namespace AlemarBudgetelHotel.Controllers
         }
 
         // ==========================================
-        // BOOK ROOM - Show booking form with automatic check-in
+        // BOOK ROOM - Show booking form (no login needed)
         // ==========================================
         public async Task<IActionResult> BookRoom(int roomId)
         {
-            var customerId = HttpContext.Session.GetInt32("CustomerId");
-            if (customerId == null)
-                return RedirectToAction("Login");
-
             var room = await _context.Rooms.FindAsync(roomId);
             if (room == null || room.Status != RoomStatus.Available)
             {
                 TempData["Error"] = "Room is not available for booking.";
                 return RedirectToAction("Rooms");
             }
-
             return View(room);
         }
 
         // ==========================================
-        // CREATE RESERVATION - Uses automatic current time for check-in
-        // Customer only selects duration, guests fixed at 1
+        // CREATE RESERVATION - Customer fills name/phone, auto check-in
         // ==========================================
         [HttpPost]
         public async Task<IActionResult> CreateReservation(
             int roomId,
             string duration,
-            int numberOfGuests,
+            string guestName,
+            string guestPhone,
+            string guestEmail,
             string specialRequests)
         {
-            var customerId = HttpContext.Session.GetInt32("CustomerId");
-            if (customerId == null)
-                return RedirectToAction("Login");
-
             try
             {
                 var room = await _context.Rooms.FindAsync(roomId);
@@ -164,24 +68,31 @@ namespace AlemarBudgetelHotel.Controllers
                     return RedirectToAction("Rooms");
                 }
 
-                // Parse duration and calculate amount
+                // Validate guest info
+                if (string.IsNullOrWhiteSpace(guestName) || string.IsNullOrWhiteSpace(guestPhone))
+                {
+                    ViewBag.Error = "Name and phone number are required.";
+                    return View("BookRoom", room);
+                }
+
+                // Parse duration
                 DurationOption durationOption;
                 decimal totalAmount;
                 int hours;
 
                 switch (duration)
                 {
-                    case "0": // 3 Hours
+                    case "0":
                         durationOption = DurationOption.ThreeHours;
                         totalAmount = room.Price3Hours;
                         hours = 3;
                         break;
-                    case "1": // 12 Hours
+                    case "1":
                         durationOption = DurationOption.TwelveHours;
                         totalAmount = room.Price12Hours;
                         hours = 12;
                         break;
-                    case "2": // 24 Hours
+                    case "2":
                         durationOption = DurationOption.TwentyFourHours;
                         totalAmount = room.Price24Hours;
                         hours = 24;
@@ -191,21 +102,37 @@ namespace AlemarBudgetelHotel.Controllers
                         return RedirectToAction("BookRoom", new { roomId });
                 }
 
+                // Create or find customer by phone
+                var customer = await _context.Customers
+                    .FirstOrDefaultAsync(c => c.PhoneNumber == guestPhone);
+
+                if (customer == null)
+                {
+                    customer = new Customer
+                    {
+                        FullName = guestName,
+                        PhoneNumber = guestPhone,
+                        Email = guestEmail,
+                        CreatedAt = DateTime.Now
+                    };
+                    _context.Customers.Add(customer);
+                    await _context.SaveChangesAsync();
+                }
+
                 // AUTOMATIC: Use current time for check-in
                 DateTime checkInDateTime = DateTime.Now;
                 DateTime checkOutDateTime = checkInDateTime.AddHours(hours);
 
-                // Create reservation with Pending status (waiting for payment)
                 var reservation = new Reservation
                 {
-                    CustomerId = customerId.Value,
+                    CustomerId = customer.CustomerId,
                     RoomId = roomId,
                     CheckInDateTime = checkInDateTime,
                     CheckOutDateTime = checkOutDateTime,
                     Duration = durationOption,
-                    NumberOfGuests = numberOfGuests, // Fixed at 1
+                    NumberOfGuests = 1,
                     SpecialRequests = specialRequests,
-                    Status = ReservationStatus.Pending, // Pending until payment confirmed
+                    Status = ReservationStatus.Pending,
                     TotalAmount = totalAmount,
                     CreatedAt = DateTime.Now
                 };
@@ -213,7 +140,6 @@ namespace AlemarBudgetelHotel.Controllers
                 _context.Reservations.Add(reservation);
                 await _context.SaveChangesAsync();
 
-                // Redirect to Payment page
                 return RedirectToAction("Payment", new { reservationId = reservation.ReservationId });
             }
             catch (Exception ex)
@@ -224,18 +150,14 @@ namespace AlemarBudgetelHotel.Controllers
         }
 
         // ==========================================
-        // PAYMENT - Show GCash payment page with QR code
+        // PAYMENT - Show GCash payment page
         // ==========================================
         public async Task<IActionResult> Payment(int reservationId)
         {
-            var customerId = HttpContext.Session.GetInt32("CustomerId");
-            if (customerId == null)
-                return RedirectToAction("Login");
-
             var reservation = await _context.Reservations
                 .Include(r => r.Room)
                 .Include(r => r.Customer)
-                .FirstOrDefaultAsync(r => r.ReservationId == reservationId && r.CustomerId == customerId);
+                .FirstOrDefaultAsync(r => r.ReservationId == reservationId);
 
             if (reservation == null)
             {
@@ -255,15 +177,11 @@ namespace AlemarBudgetelHotel.Controllers
             string gcashReferenceNumber,
             string gcashPhoneNumber)
         {
-            var customerId = HttpContext.Session.GetInt32("CustomerId");
-            if (customerId == null)
-                return RedirectToAction("Login");
-
             try
             {
                 var reservation = await _context.Reservations
                     .Include(r => r.Room)
-                    .FirstOrDefaultAsync(r => r.ReservationId == reservationId && r.CustomerId == customerId);
+                    .FirstOrDefaultAsync(r => r.ReservationId == reservationId);
 
                 if (reservation == null)
                 {
@@ -271,7 +189,7 @@ namespace AlemarBudgetelHotel.Controllers
                     return RedirectToAction("Rooms");
                 }
 
-                // Validate GCash reference number (13 digits)
+                // Validate GCash reference (13 digits)
                 if (string.IsNullOrWhiteSpace(gcashReferenceNumber) ||
                     gcashReferenceNumber.Length != 13 ||
                     !gcashReferenceNumber.All(char.IsDigit))
@@ -280,7 +198,7 @@ namespace AlemarBudgetelHotel.Controllers
                     return RedirectToAction("Payment", new { reservationId });
                 }
 
-                // Validate GCash phone number (11 digits starting with 09)
+                // Validate GCash phone (11 digits starting with 09)
                 if (string.IsNullOrWhiteSpace(gcashPhoneNumber) ||
                     gcashPhoneNumber.Length != 11 ||
                     !gcashPhoneNumber.StartsWith("09"))
@@ -289,13 +207,11 @@ namespace AlemarBudgetelHotel.Controllers
                     return RedirectToAction("Payment", new { reservationId });
                 }
 
-                // Update reservation status to Confirmed
+                // Update reservation to Confirmed
                 reservation.Status = ReservationStatus.Confirmed;
-
-                // Update room status to Occupied
                 reservation.Room.Status = RoomStatus.Occupied;
 
-                // Create payment record with GCash details
+                // Create payment record
                 var payment = new Payment
                 {
                     ReservationId = reservation.ReservationId,
@@ -311,8 +227,8 @@ namespace AlemarBudgetelHotel.Controllers
                 _context.Payments.Add(payment);
                 await _context.SaveChangesAsync();
 
-                TempData["Success"] = $"✅ Booking Confirmed! Reservation #{reservation.ReservationId} | GCash Ref: {gcashReferenceNumber}";
-                return RedirectToAction("MyReservations");
+                TempData["Success"] = $"Booking Confirmed! Reservation #{reservation.ReservationId} | GCash Ref: {gcashReferenceNumber}";
+                return RedirectToAction("BookingSuccess", new { reservationId = reservation.ReservationId });
             }
             catch (Exception ex)
             {
@@ -322,50 +238,20 @@ namespace AlemarBudgetelHotel.Controllers
         }
 
         // ==========================================
-        // MY RESERVATIONS - View all customer reservations
+        // BOOKING SUCCESS - Show confirmation page
         // ==========================================
-        public async Task<IActionResult> MyReservations()
+        public async Task<IActionResult> BookingSuccess(int reservationId)
         {
-            var customerId = HttpContext.Session.GetInt32("CustomerId");
-            if (customerId == null)
-                return RedirectToAction("Login");
-
-            var reservations = await _context.Reservations
+            var reservation = await _context.Reservations
                 .Include(r => r.Room)
+                .Include(r => r.Customer)
                 .Include(r => r.Payment)
-                .Where(r => r.CustomerId == customerId.Value)
-                .OrderByDescending(r => r.CreatedAt)
-                .ToListAsync();
+                .FirstOrDefaultAsync(r => r.ReservationId == reservationId);
 
-            return View(reservations);
-        }
+            if (reservation == null)
+                return RedirectToAction("Rooms");
 
-        // ==========================================
-        // PAYMENT HISTORY - View all customer payments
-        // ==========================================
-        public async Task<IActionResult> PaymentHistory()
-        {
-            var customerId = HttpContext.Session.GetInt32("CustomerId");
-            if (customerId == null)
-                return RedirectToAction("Login");
-
-            var payments = await _context.Payments
-                .Include(p => p.Reservation)
-                    .ThenInclude(r => r.Room)
-                .Where(p => p.Reservation.CustomerId == customerId.Value)
-                .OrderByDescending(p => p.CreatedAt)
-                .ToListAsync();
-
-            return View(payments);
-        }
-
-        // ==========================================
-        // LOGOUT
-        // ==========================================
-        public IActionResult Logout()
-        {
-            HttpContext.Session.Clear();
-            return RedirectToAction("Login");
+            return View(reservation);
         }
     }
 }

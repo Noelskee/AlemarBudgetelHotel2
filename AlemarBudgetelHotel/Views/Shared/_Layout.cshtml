@@ -6,105 +6,566 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - AlemarBudgetelHotel</title>
+    <title>@ViewData["Title"] - Alemar Budgetel Hotel</title>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/AlemarBudgetelHotel.styles.css" asp-append-version="true" />
+
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --gold: #C9A84C;
+            --gold-light: #E8C97A;
+            --dark: #0A0A0A;
+            --dark-2: #111111;
+            --dark-3: #1A1A1A;
+            --cream: #F5F0E8;
+            --white: #FFFFFF;
+            --gray: #888888;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            height: 100%;
+        }
+
+        body {
+            font-family: 'Jost', sans-serif;
+            background: var(--dark-2);
+            color: var(--cream);
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex !important;
+            flex-direction: column !important;
+            margin: 0;
+            padding: 0;
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--dark);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--gold);
+        }
+
+        /* ─────────────── NAV ─────────────── */
+        .site-nav {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: #0A0A0A;
+            border-bottom: 1px solid rgba(201,168,76,0.35);
+            padding: 0 80px;
+            height: 90px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.6);
+            flex-shrink: 0;
+        }
+
+        .nav-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.45rem;
+            font-weight: 700;
+            color: var(--gold);
+            text-decoration: none;
+            letter-spacing: 1px;
+            line-height: 1.1;
+        }
+
+            .nav-logo span {
+                display: block;
+                font-size: 0.55rem;
+                font-family: 'Jost', sans-serif;
+                font-weight: 300;
+                letter-spacing: 6px;
+                text-transform: uppercase;
+                color: var(--cream);
+                opacity: 0.55;
+            }
+
+        .nav-links {
+            display: flex;
+            gap: 2px;
+            list-style: none;
+            align-items: center;
+            margin: 0;
+            padding: 0;
+        }
+
+            .nav-links a, .nav-links .nav-user {
+                text-decoration: none;
+                color: rgba(245,240,232,0.72);
+                font-size: 0.76rem;
+                font-weight: 500;
+                letter-spacing: 2px;
+                text-transform: uppercase;
+                padding: 8px 14px;
+                border-radius: 3px;
+                transition: color 0.25s, background 0.25s;
+                display: block;
+            }
+
+                .nav-links a:hover {
+                    color: var(--gold);
+                    background: rgba(201,168,76,0.08);
+                }
+
+        .nav-user {
+            color: var(--gold) !important;
+            cursor: default;
+            font-weight: 600;
+        }
+
+        .nav-links .btn-nav-cta {
+            background: var(--gold);
+            color: var(--dark) !important;
+            font-weight: 700;
+            padding: 9px 22px;
+            margin-left: 6px;
+            border-radius: 3px;
+        }
+
+            .nav-links .btn-nav-cta:hover {
+                background: var(--gold-light);
+            }
+
+        .nav-toggle {
+            display: none;
+            background: none;
+            border: 1px solid rgba(201,168,76,0.35);
+            color: var(--gold);
+            width: 40px;
+            height: 40px;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 3px;
+            font-size: 1rem;
+        }
+
+        /* ─────────────── MAIN ─────────────── */
+        .site-main {
+            flex: 1 1 auto !important;
+            width: 100%;
+            min-height: 0;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* ─────────────── SHARED PAGE HEADER ─────────────── */
+        .page-hero {
+            background: linear-gradient(135deg,rgba(10,10,10,0.96) 0%,rgba(26,26,26,0.88) 100%), url('https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1920&q=80') center/cover no-repeat;
+            padding: 80px 60px 56px;
+            border-bottom: 1px solid rgba(201,168,76,0.12);
+        }
+
+        .page-hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 14px;
+        }
+
+            .page-hero-eyebrow::before {
+                content: '';
+                width: 35px;
+                height: 1px;
+                background: var(--gold);
+            }
+
+        .page-hero-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem,4vw,3rem);
+            font-weight: 800;
+            color: var(--white);
+            line-height: 1.1;
+        }
+
+            .page-hero-title em {
+                font-style: italic;
+                color: var(--gold);
+            }
+
+        /* ─────────────── SHARED COMPONENTS ─────────────── */
+        .gold-divider {
+            width: 50px;
+            height: 2px;
+            background: var(--gold);
+            margin: 14px 0 26px;
+        }
+
+        .section-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.68rem;
+            font-weight: 600;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 14px;
+        }
+
+            .section-tag::before {
+                content: '';
+                width: 38px;
+                height: 1px;
+                background: var(--gold);
+            }
+
+        .btn-gold {
+            background: var(--gold);
+            color: var(--dark);
+            padding: 13px 34px;
+            font-family: 'Jost', sans-serif;
+            font-size: 0.76rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            transition: all 0.3s ease;
+        }
+
+            .btn-gold:hover {
+                background: var(--gold-light);
+                color: var(--dark);
+                transform: translateY(-2px);
+                box-shadow: 0 8px 30px rgba(201,168,76,0.25);
+            }
+
+        .btn-outline-gold {
+            background: transparent;
+            color: var(--cream);
+            padding: 12px 34px;
+            font-family: 'Jost', sans-serif;
+            font-size: 0.76rem;
+            font-weight: 500;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-decoration: none;
+            border: 1px solid rgba(245,240,232,0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            transition: all 0.3s ease;
+        }
+
+            .btn-outline-gold:hover {
+                border-color: var(--gold);
+                color: var(--gold);
+            }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(36px);
+            transition: opacity 0.75s ease, transform 0.75s ease;
+        }
+
+            .reveal.visible {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+        /* ─────────────── FOOTER ─────────────── */
+        .site-footer {
+            flex-shrink: 0 !important;
+            width: 100%;
+            background: #0A0A0A !important;
+            border-top: 2px solid rgba(201,168,76,0.4);
+            padding: 60px 80px 32px;
+            box-shadow: 0 -6px 40px rgba(0,0,0,0.8);
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 60px;
+            margin-bottom: 40px;
+        }
+
+        .footer-brand {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--gold);
+            margin-bottom: 12px;
+        }
+
+        .footer-desc {
+            font-size: 0.875rem;
+            color: var(--gray);
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 10px;
+        }
+
+        .social-btn {
+            width: 36px;
+            height: 36px;
+            border: 1px solid rgba(201,168,76,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gold);
+            text-decoration: none;
+            font-size: 0.8rem;
+            transition: all 0.3s;
+        }
+
+            .social-btn:hover {
+                background: var(--gold);
+                color: var(--dark);
+            }
+
+        .footer-col-title {
+            font-size: 0.62rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 18px;
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+            .footer-links li {
+                margin-bottom: 10px;
+            }
+
+            .footer-links a {
+                text-decoration: none;
+                color: var(--gray);
+                font-size: 0.875rem;
+                transition: color 0.3s;
+            }
+
+                .footer-links a:hover {
+                    color: var(--cream);
+                }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255,255,255,0.08);
+            padding-top: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .footer-copy {
+            font-size: 0.78rem;
+            color: var(--gray);
+        }
+
+        .footer-staff a {
+            color: var(--gold);
+            text-decoration: none;
+            font-size: 0.68rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0.6;
+            transition: opacity 0.3s;
+        }
+
+            .footer-staff a:hover {
+                opacity: 1;
+            }
+
+        .footer-staff span {
+            color: rgba(201,168,76,0.3);
+            margin: 0 8px;
+        }
+
+        /* ─────────────── RESPONSIVE ─────────────── */
+        @@media (max-width: 768px) {
+            .site-nav {
+                padding: 0 20px;
+                height: 70px;
+            }
+
+            .nav-toggle {
+                display: flex;
+            }
+
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 70px;
+                left: 0;
+                right: 0;
+                background: #0A0A0A;
+                flex-direction: column;
+                border-top: 1px solid rgba(201,168,76,0.2);
+                padding: 12px 0;
+                gap: 0;
+                z-index: 999;
+            }
+
+                .nav-links.open {
+                    display: flex;
+                }
+
+                .nav-links a, .nav-links .nav-user {
+                    padding: 12px 24px;
+                    width: 100%;
+                    border-radius: 0;
+                }
+
+                .nav-links .btn-nav-cta {
+                    margin: 8px 24px;
+                    width: calc(100% - 48px);
+                    text-align: center;
+                    justify-content: center;
+                }
+
+            .page-hero {
+                padding: 60px 20px 40px;
+            }
+
+            .site-footer {
+                padding: 40px 24px 28px;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 28px;
+            }
+        }
+    </style>
+
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-            <div class="container">
 
-                <!-- ✅ Logo -->
-                <a class="navbar-brand" asp-controller="Customer" asp-action="Index">
-                    Alemar Budgetel Hotel
-                </a>
+    <!-- ═══ NAVBAR ═══ -->
+    <nav class="site-nav">
+        <a asp-controller="Customer" asp-action="Index" class="nav-logo">
+            Alemar<span>Budgetel Hotel</span>
+        </a>
 
-                <button class="navbar-toggler" type="button"
-                        data-bs-toggle="collapse"
-                        data-bs-target="#navbarNav">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
+        <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+            <i class="fas fa-bars"></i>
+        </button>
 
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto">
+        <ul class="nav-links" id="navLinks">
+            @if (Context.Session.GetInt32("CustomerId") != null)
+            {
+                <!-- Authenticated customer menu -->
+                <li><a asp-controller="Customer" asp-action="Index">Home</a></li>
+                <li><a asp-controller="Customer" asp-action="Rooms">Browse Rooms</a></li>
+                <li><a asp-controller="Customer" asp-action="MyReservations">My Bookings</a></li>
+                <li><span class="nav-user"><i class="fas fa-user-circle"></i>&nbsp;@Context.Session.GetString("CustomerName")</span></li>
+            }
+            else
+            {
+                <!-- Guest menu -->
+                <li><a asp-controller="Customer" asp-action="Index">Home</a></li>
+                <li><a href="#rooms">Rooms</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#contact">Contact</a></li>
+                <li><a asp-controller="Customer" asp-action="Rooms" class="btn-nav-cta"><i class="fas fa-calendar-check"></i> Book Now</a></li>
+            }
+        </ul>
+    </nav>
 
-                        @if (Context.Session.GetInt32("CustomerId") != null)
-                        {
-                            <!-- Logged-in menu -->
-                            <li class="nav-item">
-                                <a class="nav-link"
-                                   asp-controller="Customer"
-                                   asp-action="Index">
-                                    Home
-                                </a>
-                            </li>
+    <!-- ═══ MAIN CONTENT ═══ -->
+    <main class="site-main" role="main">
+        @RenderBody()
+    </main>
 
-                            <li class="nav-item">
-                                <a class="nav-link"
-                                   asp-controller="Customer"
-                                   asp-action="Rooms">
-                                    Browse Rooms
-                                </a>
-                            </li>
-
-                            <li class="nav-item">
-                                <span class="nav-link">
-                                    @Context.Session.GetString("CustomerName")
-                                </span>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link"
-                                   asp-controller="Customer"
-                                   asp-action="Logout">
-                                    Logout
-                                </a>
-                            </li>
-                        }
-                        else
-                        {
-                            <!-- Guest menu -->
-                            <li class="nav-item">
-                                <a class="nav-link"
-                                   asp-controller="Customer"
-                                   asp-action="Login">
-                                    Login
-                                </a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link"
-                                   asp-controller="Customer"
-                                   asp-action="Register">
-                                    Register
-                                </a>
-                            </li>
-                        }
-
-                    </ul>
+    <!-- ═══ FOOTER ═══ -->
+    <footer class="site-footer">
+        <div class="footer-grid">
+            <div>
+                <div class="footer-brand">Alemar Budgetel Hotel</div>
+                <p class="footer-desc">Your home away from home. Experience comfort, elegance, and warm Filipino hospitality in the heart of the city.</p>
+                <div class="footer-social">
+                    <a href="#" class="social-btn"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-btn"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-btn"><i class="fab fa-twitter"></i></a>
                 </div>
             </div>
-        </nav>
-    </header>
-
-    <div class="container mt-4">
-        <main role="main">
-            @RenderBody()
-        </main>
-    </div>
-
-    <footer class="bg-dark text-white mt-5 py-4">
-        <div class="container text-center">
-            <p>&copy; 2024 Alemar Budgetel Hotel. All rights reserved.</p>
+            <div>
+                <div class="footer-col-title">Quick Links</div>
+                <ul class="footer-links">
+                    <li><a asp-controller="Customer" asp-action="Index">Home</a></li>
+                    <li><a asp-controller="Customer" asp-action="Rooms">Rooms &amp; Suites</a></li>
+                    <li><a href="#about">About Us</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </div>
+            <div>
+                <div class="footer-col-title">Room Types</div>
+                <ul class="footer-links">
+                    <li><a asp-controller="Customer" asp-action="Rooms">Single Room</a></li>
+                    <li><a asp-controller="Customer" asp-action="Rooms">Double Room</a></li>
+                    <li><a asp-controller="Customer" asp-action="Rooms">Standard Room</a></li>
+                    <li><a asp-controller="Customer" asp-action="Rooms">Deluxe Room</a></li>
+                    <li><a asp-controller="Customer" asp-action="Rooms">Super Duper Suite</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="footer-copy">© 2024 Alemar Budgetel Hotel. All rights reserved.</div>
+            <div class="footer-staff"></div>
         </div>
     </footer>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script>
+        // Mobile nav toggle
+        document.getElementById('navToggle')?.addEventListener('click', () => {
+            document.getElementById('navLinks')?.classList.toggle('open');
+        });
+
+        // Scroll-reveal for inner pages
+        const reveals = document.querySelectorAll('.reveal');
+        if (reveals.length) {
+            const obs = new IntersectionObserver((entries) => {
+                entries.forEach((e, i) => {
+                    if (e.isIntersecting) setTimeout(() => e.target.classList.add('visible'), i * 110);
+                });
+            }, { threshold: 0.08 });
+            reveals.forEach(el => obs.observe(el));
+        }
+    </script>
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>

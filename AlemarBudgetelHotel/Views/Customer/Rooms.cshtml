@@ -1,95 +1,527 @@
 @model IEnumerable<AlemarBudgetelHotel.Models.Room>
 
 @{
-    ViewData["Title"] = "Available Rooms";
+    ViewData["Title"] = "Browse Rooms";
+    Layout = "_Layout";
 }
 
-<div class="container mt-4">
-    <h1 class="mb-4"><i class="fas fa-bed"></i> Available Rooms</h1>
+@section Styles {
+<style>
+    /* ─── PAGE HERO ─── */
+    .rooms-hero {
+        background: linear-gradient(135deg, rgba(10,10,10,0.94) 0%, rgba(18,14,4,0.88) 100%),
+                    url('https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1920&q=80') center/cover no-repeat;
+        padding: 90px 60px 70px;
+        border-bottom: 1px solid rgba(201,168,76,0.12);
+        position: relative;
+        overflow: hidden;
+    }
 
-    <!-- Filter Section -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <form method="get" class="row g-3">
-                <div class="col-md-4">
-                    <label class="form-label">Room Type</label>
-                    <select name="roomType" class="form-select">
-                        <option value="">All Types</option>
-                        <option value="Single">Single</option>
-                        <option value="Double">Double</option>
-                        <option value="Standard">Standard</option>
-                        <option value="Deluxe">Deluxe</option>
-                        <option value="SuperDeluxe">Super Deluxe</option>
-                        <option value="SuperDuper">Super Duper</option>
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">Duration</label>
-                    <select name="duration" class="form-select">
-                        <option value="">All Durations</option>
-                        <option value="3">3 Hours</option>
-                        <option value="12">12 Hours</option>
-                        <option value="24">24 Hours</option>
-                    </select>
-                </div>
-                <div class="col-md-4 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="fas fa-filter"></i> Filter
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
+    .rooms-hero::before {
+        content: '';
+        position: absolute;
+        top: -80px; right: -80px;
+        width: 500px; height: 500px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(201,168,76,0.06) 0%, transparent 70%);
+        pointer-events: none;
+    }
 
-    <!-- Rooms Grid -->
-    <div class="row">
-        @foreach (var room in Model)
+    .rooms-hero-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.65rem;
+        font-weight: 600;
+        letter-spacing: 5px;
+        text-transform: uppercase;
+        color: var(--gold);
+        margin-bottom: 16px;
+        opacity: 0;
+        animation: fadeUp 0.7s ease 0.1s forwards;
+    }
+
+    .rooms-hero-eyebrow::before { content:''; width:35px; height:1px; background:var(--gold); }
+
+    .rooms-hero h1 {
+        font-family: 'Playfair Display', serif;
+        font-size: clamp(2.4rem, 5vw, 4rem);
+        font-weight: 900;
+        color: var(--white);
+        line-height: 1.05;
+        margin-bottom: 18px;
+        opacity: 0;
+        animation: fadeUp 0.7s ease 0.25s forwards;
+    }
+
+    .rooms-hero h1 em { font-style: italic; color: var(--gold); }
+
+    .rooms-hero p {
+        font-size: 1rem;
+        font-weight: 300;
+        color: rgba(245,240,232,0.65);
+        line-height: 1.8;
+        max-width: 480px;
+        opacity: 0;
+        animation: fadeUp 0.7s ease 0.4s forwards;
+    }
+
+    /* ─── FILTER BAR ─── */
+    .filter-wrap {
+        background: var(--dark-3);
+        border-bottom: 1px solid rgba(201,168,76,0.12);
+        padding: 22px 60px;
+        position: sticky;
+        top: 70px;
+        z-index: 100;
+        backdrop-filter: blur(12px);
+    }
+
+    .filter-form {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
+    }
+
+    .filter-label {
+        font-size: 0.65rem;
+        font-weight: 600;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: var(--gold);
+        white-space: nowrap;
+        margin-right: 4px;
+    }
+
+    .filter-select {
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(201,168,76,0.25);
+        color: var(--cream);
+        padding: 10px 38px 10px 14px;
+        font-family: 'Jost', sans-serif;
+        font-size: 0.82rem;
+        outline: none;
+        appearance: none;
+        -webkit-appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23C9A84C'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        transition: border-color 0.25s;
+        cursor: pointer;
+        min-width: 160px;
+    }
+
+    .filter-select:focus { border-color: var(--gold); }
+    .filter-select option { background: var(--dark-3); color: var(--cream); }
+
+    .filter-btn {
+        background: var(--gold);
+        color: var(--dark);
+        padding: 10px 26px;
+        font-family: 'Jost', sans-serif;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        border: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        transition: all 0.25s;
+        white-space: nowrap;
+    }
+
+    .filter-btn:hover { background: var(--gold-light); transform: translateY(-1px); }
+
+    .filter-count {
+        margin-left: auto;
+        font-size: 0.75rem;
+        color: var(--gray);
+        letter-spacing: 1px;
+    }
+
+    .filter-count strong { color: var(--gold); }
+
+    /* ─── ROOMS CONTENT ─── */
+    .rooms-content {
+        padding: 60px;
+        background: var(--dark-2);
+    }
+
+    /* ─── ROOM CARD ─── */
+    .rooms-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2px;
+    }
+
+    .room-card {
+        position: relative;
+        overflow: hidden;
+        background: var(--dark-3);
+        cursor: pointer;
+    }
+
+    .room-card-inner {
+        position: relative;
+        aspect-ratio: 4/5;
+        overflow: hidden;
+    }
+
+    .room-img {
+        width: 100%; height: 100%;
+        object-fit: cover;
+        filter: brightness(0.65);
+        transition: transform 0.65s ease, filter 0.65s ease;
+    }
+
+    .room-card:hover .room-img {
+        transform: scale(1.07);
+        filter: brightness(0.38);
+    }
+
+    /* status ribbon */
+    .room-ribbon {
+        position: absolute;
+        top: 18px; left: 0;
+        padding: 5px 16px 5px 14px;
+        font-size: 0.6rem;
+        font-weight: 700;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        clip-path: polygon(0 0, 100% 0, 92% 50%, 100% 100%, 0 100%);
+        z-index: 3;
+    }
+
+    .room-ribbon.available   { background: var(--gold); color: var(--dark); }
+    .room-ribbon.occupied    { background: rgba(239,68,68,0.85); color: #fff; }
+    .room-ribbon.maintenance { background: rgba(100,100,100,0.85); color: #fff; }
+
+    /* overlay info */
+    .room-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.18) 55%, transparent 100%);
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 28px;
+        z-index: 2;
+        transition: padding 0.35s ease;
+    }
+
+    .room-card:hover .room-overlay { padding-bottom: 80px; }
+
+    .room-type-label {
+        font-size: 0.6rem;
+        font-weight: 600;
+        letter-spacing: 4px;
+        text-transform: uppercase;
+        color: var(--gold);
+        margin-bottom: 6px;
+    }
+
+    .room-number {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--white);
+        margin-bottom: 4px;
+    }
+
+    .room-meta {
+        font-size: 0.78rem;
+        color: rgba(245,240,232,0.55);
+        margin-bottom: 10px;
+    }
+
+    .room-price-row {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+
+    .room-price-item {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .room-price-duration {
+        font-size: 0.58rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: rgba(245,240,232,0.45);
+        margin-bottom: 2px;
+    }
+
+    .room-price-amount {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--gold);
+    }
+
+    /* hover CTA */
+    .room-cta {
+        position: absolute;
+        bottom: 28px; left: 28px; right: 28px;
+        z-index: 3;
+        opacity: 0;
+        transform: translateY(12px);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    .room-card:hover .room-cta { opacity: 1; transform: translateY(0); }
+
+    .room-cta a, .room-cta button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        padding: 13px;
+        font-family: 'Jost', sans-serif;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        transition: all 0.25s;
+    }
+
+    .room-cta .cta-book {
+        background: var(--gold);
+        color: var(--dark);
+    }
+
+    .room-cta .cta-book:hover { background: var(--gold-light); }
+
+    .room-cta .cta-unavailable {
+        background: rgba(255,255,255,0.08);
+        color: rgba(245,240,232,0.45);
+        border: 1px solid rgba(255,255,255,0.1);
+        cursor: not-allowed;
+    }
+
+    /* description strip below image */
+    .room-desc-strip {
+        background: var(--dark-3);
+        border-top: 1px solid rgba(201,168,76,0.1);
+        padding: 16px 28px;
+        font-size: 0.8rem;
+        color: var(--gray);
+        line-height: 1.6;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    /* ─── EMPTY STATE ─── */
+    .empty-state {
+        text-align: center;
+        padding: 100px 20px;
+    }
+
+    .empty-icon {
+        width: 90px; height: 90px;
+        background: rgba(201,168,76,0.08);
+        border: 1px solid rgba(201,168,76,0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 24px;
+        font-size: 2rem;
+        color: var(--gold);
+    }
+
+    .empty-state h3 {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.6rem;
+        color: var(--white);
+        margin-bottom: 10px;
+    }
+
+    .empty-state p { color: var(--gray); font-size: 0.95rem; }
+
+    /* ─── ANIMATIONS ─── */
+    @@keyframes fadeUp {
+        from { opacity: 0; transform: translateY(28px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .room-card {
+        opacity: 0;
+        animation: fadeUp 0.6s ease forwards;
+    }
+
+    @for (int i = 0; i < 12; i++)
+    {
+        <text>.rooms-grid .room-card:nth-child(@(i+1)) { animation-delay: @(i * 0.07)s; }</text>
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @@media (max-width: 1024px) {
+        .rooms-grid { grid-template-columns: repeat(2, 1fr); }
+        .rooms-content { padding: 40px 30px; }
+        .filter-wrap { padding: 18px 30px; }
+        .rooms-hero { padding: 70px 30px 50px; }
+    }
+
+    @@media (max-width: 640px) {
+        .rooms-grid { grid-template-columns: 1fr; }
+        .rooms-content { padding: 28px 16px; }
+        .filter-wrap { padding: 16px; top: 70px; }
+        .filter-form { gap: 10px; }
+        .filter-select { min-width: 100%; }
+        .filter-count { margin-left: 0; }
+        .rooms-hero { padding: 60px 16px 40px; }
+    }
+</style>
+}
+
+<!-- ═══ HERO ═══ -->
+<div class="rooms-hero">
+    <div class="rooms-hero-eyebrow">Our Accommodations</div>
+    <h1>Rooms &amp; <em>Suites</em></h1>
+    <p>From cozy singles to lavish super duper suites — find your perfect space and book in minutes.</p>
+</div>
+
+<!-- ═══ FILTER BAR ═══ -->
+<div class="filter-wrap">
+    <form method="get" class="filter-form">
+        <span class="filter-label"><i class="fas fa-sliders-h"></i> Filter</span>
+
+        <select name="roomType" class="filter-select">
+            <option value="">All Room Types</option>
+            <option value="Single"      selected="@(ViewBag.SelectedType == "Single"      ? "selected" : null)">Single</option>
+            <option value="Double"      selected="@(ViewBag.SelectedType == "Double"      ? "selected" : null)">Double</option>
+            <option value="Standard"    selected="@(ViewBag.SelectedType == "Standard"    ? "selected" : null)">Standard</option>
+            <option value="Deluxe"      selected="@(ViewBag.SelectedType == "Deluxe"      ? "selected" : null)">Deluxe</option>
+            <option value="SuperDeluxe" selected="@(ViewBag.SelectedType == "SuperDeluxe" ? "selected" : null)">Super Deluxe</option>
+            <option value="SuperDuper"  selected="@(ViewBag.SelectedType == "SuperDuper"  ? "selected" : null)">Super Duper</option>
+        </select>
+
+        <select name="duration" class="filter-select">
+            <option value="">All Durations</option>
+            <option value="3"  selected="@(ViewBag.SelectedDuration == "3"  ? "selected" : null)">3 Hours</option>
+            <option value="12" selected="@(ViewBag.SelectedDuration == "12" ? "selected" : null)">12 Hours</option>
+            <option value="24" selected="@(ViewBag.SelectedDuration == "24" ? "selected" : null)">24 Hours</option>
+        </select>
+
+        <button type="submit" class="filter-btn">
+            <i class="fas fa-search"></i> Search
+        </button>
+
+        @if (!string.IsNullOrEmpty(ViewBag.SelectedType as string) || !string.IsNullOrEmpty(ViewBag.SelectedDuration as string))
         {
-            <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card room-card h-100">
-                    <div class="room-image-placeholder">
-                        <i class="fas fa-bed fa-5x text-muted"></i>
-                        <div class="room-type-badge">@room.Type</div>
-                        <div class="room-status-badge badge-@room.Status.ToString().ToLower()">
-                            @room.Status
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <h5 class="card-title">Room @room.RoomNumber</h5>
-                        <p class="text-muted">Floor @room.Floor | Capacity: @room.Capacity</p>
-                        <p class="card-text">@room.Description</p>
-                        
-                        <div class="pricing-table mb-3">
-                            <div class="d-flex justify-content-between mb-2">
-                                <span><i class="fas fa-clock"></i> 3 Hours:</span>
-                                <strong class="text-primary">₱@room.Price3Hours.ToString("N2")</strong>
-                            </div>
-                            <div class="d-flex justify-content-between mb-2">
-                                <span><i class="fas fa-clock"></i> 12 Hours:</span>
-                                <strong class="text-primary">₱@room.Price12Hours.ToString("N2")</strong>
-                            </div>
-                            <div class="d-flex justify-content-between">
-                                <span><i class="fas fa-clock"></i> 24 Hours:</span>
-                                <strong class="text-primary">₱@room.Price24Hours.ToString("N2")</strong>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-footer bg-transparent">
-                        @if (room.Status == RoomStatus.Available)
-                        {
-                            <a href="/Customer/BookRoom?roomId=@room.RoomId" class="btn btn-primary w-100">
-                                <i class="fas fa-calendar-check"></i> Book This Room
-                            </a>
-                        }
-                        else
-                        {
-                            <button class="btn btn-secondary w-100" disabled>
-                                Not Available
-                            </button>
-                        }
-                    </div>
-                </div>
-            </div>
+            <a href="@Url.Action("Rooms", "Customer")" style="font-size:0.72rem;color:var(--gray);text-decoration:none;letter-spacing:1px;">
+                <i class="fas fa-times"></i> Clear
+            </a>
         }
-    </div>
+
+        @if (Model != null)
+        {
+            <span class="filter-count">
+                Showing <strong>@Model.Count()</strong> room@(Model.Count() == 1 ? "" : "s")
+            </span>
+        }
+    </form>
+</div>
+
+<!-- ═══ ROOM GRID ═══ -->
+<div class="rooms-content">
+    @if (Model != null && Model.Any())
+    {
+        <div class="rooms-grid">
+            @foreach (var room in Model)
+            {
+                <div class="room-card">
+                    <div class="room-card-inner">
+
+                        <!-- status ribbon -->
+                        @{
+                            var ribbonClass = room.Status == RoomStatus.Available ? "available"
+                                           : room.Status == RoomStatus.Occupied   ? "occupied"
+                                           : "maintenance";
+                        }
+                        <div class="room-ribbon @ribbonClass">@room.Status</div>
+
+                        <!-- room image placeholder with gradient -->
+                        <div class="room-img" style="
+                            background: linear-gradient(135deg,
+                                hsl(@(Math.Abs(room.RoomId * 37 % 360)), 20%, 14%) 0%,
+                                hsl(@(Math.Abs(room.RoomId * 53 % 360)), 15%, 8%) 100%);
+                            display: flex; align-items: center; justify-content: center;
+                            filter: brightness(1);">
+                            <i class="fas fa-bed" style="font-size: 4rem; color: rgba(201,168,76,0.18);"></i>
+                        </div>
+
+                        <!-- overlay info -->
+                        <div class="room-overlay">
+                            <div class="room-type-label">@room.Type</div>
+                            <div class="room-number">Room @room.RoomNumber</div>
+                            <div class="room-meta">
+                                <i class="fas fa-layer-group" style="color:var(--gold);font-size:0.7rem;"></i> Floor @room.Floor
+                                &nbsp;&nbsp;
+                                <i class="fas fa-user-friends" style="color:var(--gold);font-size:0.7rem;"></i> Up to @room.Capacity
+                            </div>
+                            <div class="room-price-row">
+                                <div class="room-price-item">
+                                    <span class="room-price-duration">3 hrs</span>
+                                    <span class="room-price-amount">₱@room.Price3Hours.ToString("N0")</span>
+                                </div>
+                                <div class="room-price-item">
+                                    <span class="room-price-duration">12 hrs</span>
+                                    <span class="room-price-amount">₱@room.Price12Hours.ToString("N0")</span>
+                                </div>
+                                <div class="room-price-item">
+                                    <span class="room-price-duration">24 hrs</span>
+                                    <span class="room-price-amount">₱@room.Price24Hours.ToString("N0")</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- hover CTA -->
+                        <div class="room-cta">
+                            @if (room.Status == RoomStatus.Available)
+                            {
+                                <a href="/Customer/BookRoom?roomId=@room.RoomId" class="cta-book">
+                                    <i class="fas fa-calendar-check"></i> Book This Room
+                                </a>
+                            }
+                            else
+                            {
+                                <button class="cta-unavailable" disabled>
+                                    <i class="fas fa-ban"></i> Not Available
+                                </button>
+                            }
+                        </div>
+                    </div>
+
+                    @if (!string.IsNullOrWhiteSpace(room.Description))
+                    {
+                        <div class="room-desc-strip">@room.Description</div>
+                    }
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="empty-state">
+            <div class="empty-icon"><i class="fas fa-bed"></i></div>
+            <h3>No Rooms Found</h3>
+            <p>Try adjusting your filters or check back later.</p>
+            <br>
+            <a href="@Url.Action("Rooms", "Customer")" class="btn-gold" style="margin-top:16px;">
+                <i class="fas fa-redo"></i> Clear Filters
+            </a>
+        </div>
+    }
 </div>

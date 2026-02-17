@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using AlemarBudgetelHotel.Helpers;
 using AlemarBudgetelHotel.Models;
-using AlemarBudgetelHotel.Data;
 
 namespace AlemarBudgetelHotel.Data
 {
@@ -13,6 +12,7 @@ namespace AlemarBudgetelHotel.Data
         }
 
         public DbSet<Admin> Admins { get; set; }
+        public DbSet<Staff> Staffs { get; set; }
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Room> Rooms { get; set; }
         public DbSet<Reservation> Reservations { get; set; }
@@ -32,12 +32,18 @@ namespace AlemarBudgetelHotel.Data
                 entity.HasIndex(e => e.Username).IsUnique();
             });
 
-            // Configure Customer entity
+            // Configure Staff entity
+            modelBuilder.Entity<Staff>(entity =>
+            {
+                entity.HasKey(e => e.StaffId);
+                entity.HasIndex(e => e.Email).IsUnique();
+                entity.HasIndex(e => e.Username).IsUnique();
+            });
+
+            // Configure Customer entity (no login - just info)
             modelBuilder.Entity<Customer>(entity =>
             {
                 entity.HasKey(e => e.CustomerId);
-                entity.HasIndex(e => e.Email).IsUnique();
-                entity.HasIndex(e => e.Username).IsUnique();
             });
 
             // Configure Room entity
@@ -100,46 +106,61 @@ namespace AlemarBudgetelHotel.Data
                     .OnDelete(DeleteBehavior.Restrict);
             });
 
-            // Seed initial data
             SeedData(modelBuilder);
         }
 
         private void SeedData(ModelBuilder modelBuilder)
         {
-            
+            modelBuilder.Entity<Admin>().HasData(
+                new Admin
+                {
+                    AdminId = 1,
+                    FullName = "System Administrator",
+                    Email = "admin@alemarbudgetel.com",
+                    Username = "admin",
+                    PasswordHash = AdminPasswordHasher.HashPassword("admin123"),
+                    PhoneNumber = "09123456789",
+                    Role = "SuperAdmin",
+                    IsActive = true,
+                    CreatedAt = new DateTime(2024, 1, 1)
+                }
+            );
 
-            // Seed Rooms with 3-hour, 12-hour, and 24-hour pricing
+            modelBuilder.Entity<Staff>().HasData(
+                new Staff
+                {
+                    StaffId = 1,
+                    FullName = "Front Desk Staff",
+                    Email = "staff@alemarbudgetel.com",
+                    Username = "staff",
+                    PasswordHash = StaffPasswordHasher.HashPassword("staff123"),
+                    PhoneNumber = "09123456780",
+                    Role = StaffRole.Receptionist,
+                    IsActive = true,
+                    CreatedAt = new DateTime(2024, 1, 1)
+                }
+            );
+
             var rooms = new[]
             {
-                // Single Rooms
-                new Room { RoomId = 1, RoomNumber = "101", Type = RoomType.Single, Price3Hours = 300M, Price12Hours = 800M, Price24Hours = 1200M, Status = RoomStatus.Available, Description = "Cozy single room", Capacity = 1, Floor = 1, ImageUrl = "/images/rooms/single.jpg", CreatedAt = DateTime.Now },
-                new Room { RoomId = 2, RoomNumber = "102", Type = RoomType.Single, Price3Hours = 300M, Price12Hours = 800M, Price24Hours = 1200M, Status = RoomStatus.Available, Description = "Cozy single room", Capacity = 1, Floor = 1, ImageUrl = "/images/rooms/single.jpg", CreatedAt = DateTime.Now },
-                new Room { RoomId = 3, RoomNumber = "103", Type = RoomType.Single, Price3Hours = 300M, Price12Hours = 800M, Price24Hours = 1200M, Status = RoomStatus.Available, Description = "Cozy single room", Capacity = 1, Floor = 1, ImageUrl = "/images/rooms/single.jpg", CreatedAt = DateTime.Now },
-
-                // Double Rooms
-                new Room { RoomId = 4, RoomNumber = "201", Type = RoomType.Double, Price3Hours = 500M, Price12Hours = 1200M, Price24Hours = 1800M, Status = RoomStatus.Available, Description = "Comfortable double room", Capacity = 2, Floor = 2, ImageUrl = "/images/rooms/double.jpg", CreatedAt = DateTime.Now },
-                new Room { RoomId = 5, RoomNumber = "202", Type = RoomType.Double, Price3Hours = 500M, Price12Hours = 1200M, Price24Hours = 1800M, Status = RoomStatus.Available, Description = "Comfortable double room", Capacity = 2, Floor = 2, ImageUrl = "/images/rooms/double.jpg", CreatedAt = DateTime.Now },
-                new Room { RoomId = 6, RoomNumber = "203", Type = RoomType.Double, Price3Hours = 500M, Price12Hours = 1200M, Price24Hours = 1800M, Status = RoomStatus.Available, Description = "Comfortable double room", Capacity = 2, Floor = 2, ImageUrl = "/images/rooms/double.jpg", CreatedAt = DateTime.Now },
-
-                // Standard Rooms
-                new Room { RoomId = 7, RoomNumber = "301", Type = RoomType.Standard, Price3Hours = 700M, Price12Hours = 1800M, Price24Hours = 2500M, Status = RoomStatus.Available, Description = "Standard room with modern amenities", Capacity = 2, Floor = 3, ImageUrl = "/images/rooms/standard.jpg", CreatedAt = DateTime.Now },
-                new Room { RoomId = 8, RoomNumber = "302", Type = RoomType.Standard, Price3Hours = 700M, Price12Hours = 1800M, Price24Hours = 2500M, Status = RoomStatus.Available, Description = "Standard room with modern amenities", Capacity = 2, Floor = 3, ImageUrl = "/images/rooms/standard.jpg", CreatedAt = DateTime.Now },
-                new Room { RoomId = 9, RoomNumber = "303", Type = RoomType.Standard, Price3Hours = 700M, Price12Hours = 1800M, Price24Hours = 2500M, Status = RoomStatus.Available, Description = "Standard room with modern amenities", Capacity = 2, Floor = 3, ImageUrl = "/images/rooms/standard.jpg", CreatedAt = DateTime.Now },
-
-                // Deluxe Rooms
-                new Room { RoomId = 10, RoomNumber = "401", Type = RoomType.Deluxe, Price3Hours = 1000M, Price12Hours = 2500M, Price24Hours = 3500M, Status = RoomStatus.Available, Description = "Deluxe room with premium facilities", Capacity = 3, Floor = 4, ImageUrl = "/images/rooms/deluxe.jpg", CreatedAt = DateTime.Now },
-                new Room { RoomId = 11, RoomNumber = "402", Type = RoomType.Deluxe, Price3Hours = 1000M, Price12Hours = 2500M, Price24Hours = 3500M, Status = RoomStatus.Available, Description = "Deluxe room with premium facilities", Capacity = 3, Floor = 4, ImageUrl = "/images/rooms/deluxe.jpg", CreatedAt = DateTime.Now },
-                new Room { RoomId = 12, RoomNumber = "403", Type = RoomType.Deluxe, Price3Hours = 1000M, Price12Hours = 2500M, Price24Hours = 3500M, Status = RoomStatus.Available, Description = "Deluxe room with premium facilities", Capacity = 3, Floor = 4, ImageUrl = "/images/rooms/deluxe.jpg", CreatedAt = DateTime.Now },
-
-                // Super Deluxe Rooms
-                new Room { RoomId = 13, RoomNumber = "501", Type = RoomType.SuperDeluxe, Price3Hours = 1500M, Price12Hours = 3500M, Price24Hours = 5000M, Status = RoomStatus.Available, Description = "Super deluxe room with luxury amenities", Capacity = 4, Floor = 5, ImageUrl = "/images/rooms/super-deluxe.jpg", CreatedAt = DateTime.Now },
-                new Room { RoomId = 14, RoomNumber = "502", Type = RoomType.SuperDeluxe, Price3Hours = 1500M, Price12Hours = 3500M, Price24Hours = 5000M, Status = RoomStatus.Available, Description = "Super deluxe room with luxury amenities", Capacity = 4, Floor = 5, ImageUrl = "/images/rooms/super-deluxe.jpg", CreatedAt = DateTime.Now },
-                new Room { RoomId = 15, RoomNumber = "503", Type = RoomType.SuperDeluxe, Price3Hours = 1500M, Price12Hours = 3500M, Price24Hours = 5000M, Status = RoomStatus.Available, Description = "Super deluxe room with luxury amenities", Capacity = 4, Floor = 5, ImageUrl = "/images/rooms/super-deluxe.jpg", CreatedAt = DateTime.Now },
-
-                // Super Duper Suites
-                new Room { RoomId = 16, RoomNumber = "601", Type = RoomType.SuperDuper, Price3Hours = 2000M, Price12Hours = 5000M, Price24Hours = 7000M, Status = RoomStatus.Available, Description = "Premium super duper suite", Capacity = 5, Floor = 6, ImageUrl = "/images/rooms/super-duper.jpg", CreatedAt = DateTime.Now },
-                new Room { RoomId = 17, RoomNumber = "602", Type = RoomType.SuperDuper, Price3Hours = 2000M, Price12Hours = 5000M, Price24Hours = 7000M, Status = RoomStatus.Available, Description = "Premium super duper suite", Capacity = 5, Floor = 6, ImageUrl = "/images/rooms/super-duper.jpg", CreatedAt = DateTime.Now },
-                new Room { RoomId = 18, RoomNumber = "603", Type = RoomType.SuperDuper, Price3Hours = 2000M, Price12Hours = 5000M, Price24Hours = 7000M, Status = RoomStatus.Available, Description = "Premium super duper suite", Capacity = 5, Floor = 6, ImageUrl = "/images/rooms/super-duper.jpg", CreatedAt = DateTime.Now }
+                new Room { RoomId = 1, RoomNumber = "101", Type = RoomType.Single, Price3Hours = 300M, Price12Hours = 800M, Price24Hours = 1200M, Status = RoomStatus.Available, Description = "Cozy single room", Capacity = 1, Floor = 1, ImageUrl = "/images/rooms/single.jpg", CreatedAt = new DateTime(2024, 1, 1) },
+                new Room { RoomId = 2, RoomNumber = "102", Type = RoomType.Single, Price3Hours = 300M, Price12Hours = 800M, Price24Hours = 1200M, Status = RoomStatus.Available, Description = "Cozy single room", Capacity = 1, Floor = 1, ImageUrl = "/images/rooms/single.jpg", CreatedAt = new DateTime(2024, 1, 1) },
+                new Room { RoomId = 3, RoomNumber = "103", Type = RoomType.Single, Price3Hours = 300M, Price12Hours = 800M, Price24Hours = 1200M, Status = RoomStatus.Available, Description = "Cozy single room", Capacity = 1, Floor = 1, ImageUrl = "/images/rooms/single.jpg", CreatedAt = new DateTime(2024, 1, 1) },
+                new Room { RoomId = 4, RoomNumber = "201", Type = RoomType.Double, Price3Hours = 500M, Price12Hours = 1200M, Price24Hours = 1800M, Status = RoomStatus.Available, Description = "Comfortable double room", Capacity = 2, Floor = 2, ImageUrl = "/images/rooms/double.jpg", CreatedAt = new DateTime(2024, 1, 1) },
+                new Room { RoomId = 5, RoomNumber = "202", Type = RoomType.Double, Price3Hours = 500M, Price12Hours = 1200M, Price24Hours = 1800M, Status = RoomStatus.Available, Description = "Comfortable double room", Capacity = 2, Floor = 2, ImageUrl = "/images/rooms/double.jpg", CreatedAt = new DateTime(2024, 1, 1) },
+                new Room { RoomId = 6, RoomNumber = "203", Type = RoomType.Double, Price3Hours = 500M, Price12Hours = 1200M, Price24Hours = 1800M, Status = RoomStatus.Available, Description = "Comfortable double room", Capacity = 2, Floor = 2, ImageUrl = "/images/rooms/double.jpg", CreatedAt = new DateTime(2024, 1, 1) },
+                new Room { RoomId = 7, RoomNumber = "301", Type = RoomType.Standard, Price3Hours = 700M, Price12Hours = 1800M, Price24Hours = 2500M, Status = RoomStatus.Available, Description = "Standard room with modern amenities", Capacity = 2, Floor = 3, ImageUrl = "/images/rooms/standard.jpg", CreatedAt = new DateTime(2024, 1, 1) },
+                new Room { RoomId = 8, RoomNumber = "302", Type = RoomType.Standard, Price3Hours = 700M, Price12Hours = 1800M, Price24Hours = 2500M, Status = RoomStatus.Available, Description = "Standard room with modern amenities", Capacity = 2, Floor = 3, ImageUrl = "/images/rooms/standard.jpg", CreatedAt = new DateTime(2024, 1, 1) },
+                new Room { RoomId = 9, RoomNumber = "303", Type = RoomType.Standard, Price3Hours = 700M, Price12Hours = 1800M, Price24Hours = 2500M, Status = RoomStatus.Available, Description = "Standard room with modern amenities", Capacity = 2, Floor = 3, ImageUrl = "/images/rooms/standard.jpg", CreatedAt = new DateTime(2024, 1, 1) },
+                new Room { RoomId = 10, RoomNumber = "401", Type = RoomType.Deluxe, Price3Hours = 1000M, Price12Hours = 2500M, Price24Hours = 3500M, Status = RoomStatus.Available, Description = "Deluxe room with premium facilities", Capacity = 3, Floor = 4, ImageUrl = "/images/rooms/deluxe.jpg", CreatedAt = new DateTime(2024, 1, 1) },
+                new Room { RoomId = 11, RoomNumber = "402", Type = RoomType.Deluxe, Price3Hours = 1000M, Price12Hours = 2500M, Price24Hours = 3500M, Status = RoomStatus.Available, Description = "Deluxe room with premium facilities", Capacity = 3, Floor = 4, ImageUrl = "/images/rooms/deluxe.jpg", CreatedAt = new DateTime(2024, 1, 1) },
+                new Room { RoomId = 12, RoomNumber = "403", Type = RoomType.Deluxe, Price3Hours = 1000M, Price12Hours = 2500M, Price24Hours = 3500M, Status = RoomStatus.Available, Description = "Deluxe room with premium facilities", Capacity = 3, Floor = 4, ImageUrl = "/images/rooms/deluxe.jpg", CreatedAt = new DateTime(2024, 1, 1) },
+                new Room { RoomId = 13, RoomNumber = "501", Type = RoomType.SuperDeluxe, Price3Hours = 1500M, Price12Hours = 3500M, Price24Hours = 5000M, Status = RoomStatus.Available, Description = "Super deluxe room with luxury amenities", Capacity = 4, Floor = 5, ImageUrl = "/images/rooms/super-deluxe.jpg", CreatedAt = new DateTime(2024, 1, 1) },
+                new Room { RoomId = 14, RoomNumber = "502", Type = RoomType.SuperDeluxe, Price3Hours = 1500M, Price12Hours = 3500M, Price24Hours = 5000M, Status = RoomStatus.Available, Description = "Super deluxe room with luxury amenities", Capacity = 4, Floor = 5, ImageUrl = "/images/rooms/super-deluxe.jpg", CreatedAt = new DateTime(2024, 1, 1) },
+                new Room { RoomId = 15, RoomNumber = "503", Type = RoomType.SuperDeluxe, Price3Hours = 1500M, Price12Hours = 3500M, Price24Hours = 5000M, Status = RoomStatus.Available, Description = "Super deluxe room with luxury amenities", Capacity = 4, Floor = 5, ImageUrl = "/images/rooms/super-deluxe.jpg", CreatedAt = new DateTime(2024, 1, 1) },
+                new Room { RoomId = 16, RoomNumber = "601", Type = RoomType.SuperDuper, Price3Hours = 2000M, Price12Hours = 5000M, Price24Hours = 7000M, Status = RoomStatus.Available, Description = "Premium super duper suite", Capacity = 5, Floor = 6, ImageUrl = "/images/rooms/super-duper.jpg", CreatedAt = new DateTime(2024, 1, 1) },
+                new Room { RoomId = 17, RoomNumber = "602", Type = RoomType.SuperDuper, Price3Hours = 2000M, Price12Hours = 5000M, Price24Hours = 7000M, Status = RoomStatus.Available, Description = "Premium super duper suite", Capacity = 5, Floor = 6, ImageUrl = "/images/rooms/super-duper.jpg", CreatedAt = new DateTime(2024, 1, 1) },
+                new Room { RoomId = 18, RoomNumber = "603", Type = RoomType.SuperDuper, Price3Hours = 2000M, Price12Hours = 5000M, Price24Hours = 7000M, Status = RoomStatus.Available, Description = "Premium super duper suite", Capacity = 5, Floor = 6, ImageUrl = "/images/rooms/super-duper.jpg", CreatedAt = new DateTime(2024, 1, 1) }
             };
 
             modelBuilder.Entity<Room>().HasData(rooms);

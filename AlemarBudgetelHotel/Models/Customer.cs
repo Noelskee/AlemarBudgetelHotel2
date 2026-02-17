@@ -12,17 +12,9 @@ namespace AlemarBudgetelHotel.Models
         [StringLength(100)]
         public string FullName { get; set; }
 
-        [Required]
         [StringLength(100)]
         [EmailAddress]
         public string Email { get; set; }
-
-        [Required]
-        [StringLength(100)]
-        public string Username { get; set; }
-
-        [Required]
-        public string PasswordHash { get; set; }
 
         [Required]
         [Phone]
@@ -32,11 +24,9 @@ namespace AlemarBudgetelHotel.Models
         [StringLength(500)]
         public string Address { get; set; }
 
-        public bool IsActive { get; set; } = true;
-
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
-        public DateTime? LastLoginAt { get; set; }
+        public bool IsActive { get; set; } = true;
 
         // Navigation property
         public virtual ICollection<Reservation> Reservations { get; set; }
